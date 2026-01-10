@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner Absensi SMP Islam Az-Zahro</title>
+    <title>Absensi Digital SMP Islam Az-Zahro</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #1a1a1a; color: white; padding: 20px; }
+        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; padding: 20px; }
         #reader { width: 100%; max-width: 400px; margin: 0 auto; border: 4px solid #f39c12; border-radius: 10px; overflow: hidden; }
         select { width: 100%; max-width: 400px; padding: 12px; margin: 20px 0; background: #333; color: white; border: 1px solid #f39c12; font-size: 16px; }
-        #status-kirim { margin-top: 15px; padding: 10px; border-radius: 5px; display: none; }
+        #status-kirim { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; font-weight: bold; }
         .success { background: #27ae60; display: block !important; }
         .loading { background: #e67e22; display: block !important; }
     </style>
@@ -28,11 +28,12 @@
     <div id="status-kirim"></div>
 
     <script>
+        // MASUKKAN URL WEB APP ANDA DI SINI
         const scriptURL = 'https://script.google.com/macros/s/AKfycbymPb3X3Jb_AzVQdhPZ3kq9o3N4ohXZpAnNS5Q5UFcnh1YZxtIpDVnmH5m13XPl-UiU/exec';
         let isProcessing = false;
 
         function onScanSuccess(decodedText) {
-            if (isProcessing) return; // Mencegah scan ganda di saat bersamaan
+            if (isProcessing) return; 
             
             isProcessing = true;
             const statusDiv = document.getElementById('status-kirim');
@@ -40,20 +41,25 @@
 
             statusDiv.innerText = "Mengirim: " + decodedText;
             statusDiv.className = "loading";
+            statusDiv.style.display = "block";
 
-            fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ket)}`)
+            // Mengirim data menggunakan metode GET dengan mode no-cors
+            fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ket)}`, {
+                method: 'GET',
+                mode: 'no-cors'
+            })
             .then(() => {
                 statusDiv.innerText = "BERHASIL: " + decodedText + " (" + ket + ")";
                 statusDiv.className = "success";
                 
-                // Reset untuk scan berikutnya setelah 2 detik
+                // Reset scanner untuk siswa berikutnya setelah 3 detik
                 setTimeout(() => {
                     statusDiv.style.display = "none";
                     isProcessing = false;
-                }, 2000);
+                }, 3000);
             })
             .catch(err => {
-                alert("Koneksi Error!");
+                alert("Koneksi Error! Cek URL Script atau Sinyal.");
                 isProcessing = false;
             });
         }
