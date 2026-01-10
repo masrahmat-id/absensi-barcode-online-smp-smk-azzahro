@@ -20,7 +20,36 @@
             color: white;
             margin: 0;
             padding: 20px;
-            overflow-x: hidden;
+        }
+
+        /* Ikon Pengaturan */
+        .settings-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001;
+            background: rgba(255,255,255,0.1);
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        /* Modal Pengaturan */
+        #settings-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid var(--primary);
+            z-index: 1002;
+            width: 85%;
+            max-width: 320px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
         }
 
         #status-kirim {
@@ -52,36 +81,54 @@
             border: 1px solid #333;
         }
 
-        #reader {
-            width: 100%;
-            border-radius: 15px;
-            overflow: hidden;
-            background: black;
-        }
-
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: black; }
         #reader__dashboard, #reader__camera_selection { display: none !important; }
 
-        select {
+        select, .btn-save {
             width: 100%;
-            max-width: 420px;
-            padding: 15px;
-            margin-bottom: 20px;
-            background: var(--card-bg);
+            padding: 12px;
+            margin-top: 10px;
+            background: #333;
             color: white;
-            border: 2px solid #333;
-            border-radius: 12px;
-            font-size: 16px;
-            outline: none;
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
+    <div class="settings-icon" onclick="toggleSettings()">⚙️</div>
+
+    <div id="settings-modal">
+        <h4 style="margin-top:0">Pengaturan Suara</h4>
+        <label style="font-size: 12px; color: #aaa;">Pilih Notifikasi Sukses:</label>
+        <select id="sound-choice">
+            <option value="Done.mp3">Done</option>
+            <option value="Mission-success.mp3">Mission Success</option>
+            <option value="Notif01.mp3">Notif 01</option>
+            <option value="Notif02.mp3">Notif 02</option>
+            <option value="Notif03.mp3">Notif 03</option>
+            <option value="Success-fanfare-trumpets.mp3">Success Fanfare</option>
+            <option value="Yayyy.mp3">Yayyy!</option>
+        </select>
+        <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
+    </div>
+
     <div id="status-kirim"></div>
 
-    <h3>ABSENSI DIGITAL<br>SMP Islam Az-Zahro & SMK Az-Zahro</h3>
+    <h3>ABSENSI DIGITAL<br>SMP & SMK Az-Zahro</h3>
     
-    <select id="keterangan">
+    <select id="keterangan" style="max-width: 420px; margin-bottom: 20px; background: var(--card-bg); color: white; border: 2px solid #333; border-radius: 12px; font-size: 16px;">
         <option value="●">HADIR</option>
         <option value="I">IZIN</option>
         <option value="S">SAKIT</option>
@@ -94,18 +141,31 @@
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwCXbDTuaFkN7GlcXJxaFgDaKPEp2G9vySF1IKfWxUCTuEOCYt39nMmlEmI25pz4PSd/exec';
+        const rawURL = 'https://github.com/masrahmat-id/absensi/raw/main/';
         let isProcessing = false;
 
-        // Kode Suara Beep Standar (Data URI)
-        const beep = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YV9vT18AZu7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u");
+        // Load pengaturan suara dari memori HP
+        let currentSoundFile = localStorage.getItem('selectedSound') || 'Notif01.mp3';
+        document.getElementById('sound-choice').value = currentSoundFile;
+
+        function toggleSettings() {
+            const modal = document.getElementById('settings-modal');
+            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function saveSettings() {
+            currentSoundFile = document.getElementById('sound-choice').value;
+            localStorage.setItem('selectedSound', currentSoundFile);
+            
+            // Tes suara saat disimpan
+            const testAudio = new Audio(rawURL + currentSoundFile);
+            testAudio.play();
+            
+            toggleSettings();
+        }
 
         const html5QrCode = new Html5Qrcode("reader");
-        
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            { fps: 20, qrbox: 250 }, 
-            onScanSuccess
-        ).catch(err => alert("Izin kamera diperlukan!"));
+        html5QrCode.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, onScanSuccess);
 
         function onScanSuccess(decodedText) {
             if (isProcessing) return; 
@@ -114,10 +174,10 @@
             const statusDiv = document.getElementById('status-kirim');
             const ket = document.getElementById('keterangan').value;
 
-            // Mainkan Suara
-            beep.play().catch(e => console.log("Audio diblokir browser. Klik layar dulu sekali."));
+            // Putar suara yang dipilih dari GitHub
+            const audio = new Audio(rawURL + currentSoundFile);
+            audio.play().catch(e => console.log("Izin audio diperlukan"));
 
-            // Getaran HP
             if (navigator.vibrate) navigator.vibrate(100);
 
             statusDiv.innerText = "Mengirim: " + decodedText;
@@ -133,7 +193,6 @@
             setTimeout(() => {
                 statusDiv.innerText = "✔ TERKIRIM: " + decodedText;
                 statusDiv.className = "success";
-                
                 setTimeout(() => {
                     statusDiv.style.opacity = "0";
                     setTimeout(() => {
@@ -141,7 +200,6 @@
                         isProcessing = false;
                     }, 500); 
                 }, 1500); 
-
             }, 600);
         }
     </script>
