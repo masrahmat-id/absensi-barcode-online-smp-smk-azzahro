@@ -7,22 +7,35 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
+            /* Palette Mode Gelap (Default) */
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
             --primary: #f39c12;
             --success: #27ae60;
-            --dark-bg: #121212;
-            --card-bg: #1e1e1e;
+            --border-color: #333;
+        }
+
+        [data-theme="light"] {
+            /* Palette Mode Terang */
+            --bg-color: #f5f6fa;
+            --card-bg: #ffffff;
+            --text-color: #2f3640;
+            --primary: #e67e22;
+            --success: #2ecc71;
+            --border-color: #dcdde1;
         }
 
         body {
             font-family: 'Segoe UI', sans-serif;
             text-align: center;
-            background-color: var(--dark-bg);
-            color: white;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 20px;
+            transition: background 0.3s, color 0.3s;
         }
 
-        /* Ikon Pengaturan */
         .settings-icon {
             position: absolute;
             top: 20px;
@@ -30,12 +43,11 @@
             font-size: 24px;
             cursor: pointer;
             z-index: 1001;
-            background: rgba(255,255,255,0.1);
+            background: rgba(128,128,128,0.2);
             padding: 8px;
             border-radius: 50%;
         }
 
-        /* Modal Pengaturan */
         #settings-modal {
             display: none;
             position: fixed;
@@ -49,7 +61,8 @@
             z-index: 1002;
             width: 85%;
             max-width: 320px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            color: var(--text-color);
         }
 
         #status-kirim {
@@ -64,12 +77,12 @@
             font-weight: bold;
             z-index: 9999;
             display: none;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
             transition: opacity 0.5s ease;
+            background-color: var(--success);
+            color: white;
+            border: 1px solid white;
         }
-
-        .success { background-color: var(--success); display: block !important; border: 1px solid white; }
-        .loading { background-color: var(--primary); display: block !important; }
 
         .scanner-box {
             width: 100%;
@@ -78,7 +91,8 @@
             background: var(--card-bg);
             padding: 10px;
             border-radius: 20px;
-            border: 1px solid #333;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         #reader { width: 100%; border-radius: 15px; overflow: hidden; background: black; }
@@ -88,8 +102,8 @@
             width: 100%;
             padding: 12px;
             margin-top: 10px;
-            background: #333;
-            color: white;
+            background: var(--card-bg);
+            color: var(--text-color);
             border: 1px solid var(--primary);
             border-radius: 8px;
             font-size: 14px;
@@ -97,21 +111,30 @@
 
         .btn-save {
             background: var(--primary);
-            color: #000;
+            color: white;
             font-weight: bold;
             cursor: pointer;
             border: none;
             margin-top: 20px;
         }
+
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding: 0 5px;
+        }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
     <div class="settings-icon" onclick="toggleSettings()">⚙️</div>
 
     <div id="settings-modal">
-        <h4 style="margin-top:0">Pengaturan Suara</h4>
-        <label style="font-size: 12px; color: #aaa;">Pilih Notifikasi Sukses:</label>
+        <h4 style="margin-top:0">Pengaturan</h4>
+        
+        <label style="font-size: 12px; color: gray;">Pilih Notifikasi Suara:</label>
         <select id="sound-choice">
             <option value="Done.mp3">Done</option>
             <option value="Mission-success.mp3">Mission Success</option>
@@ -121,6 +144,12 @@
             <option value="Success-fanfare-trumpets.mp3">Success Fanfare</option>
             <option value="Yayyy.mp3">Yayyy!</option>
         </select>
+
+        <div class="toggle-container">
+            <span style="font-size: 14px;">Mode Terang</span>
+            <input type="checkbox" id="theme-toggle" onchange="previewTheme()">
+        </div>
+
         <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
     </div>
 
@@ -128,7 +157,7 @@
 
     <h3>ABSENSI DIGITAL<br>SMP & SMK Az-Zahro</h3>
     
-    <select id="keterangan" style="max-width: 420px; margin-bottom: 20px; background: var(--card-bg); color: white; border: 2px solid #333; border-radius: 12px; font-size: 16px;">
+    <select id="keterangan" style="max-width: 420px; margin-bottom: 20px;">
         <option value="●">HADIR</option>
         <option value="I">IZIN</option>
         <option value="S">SAKIT</option>
@@ -144,20 +173,32 @@
         const rawURL = 'https://github.com/masrahmat-id/absensi/raw/main/';
         let isProcessing = false;
 
-        // Load pengaturan suara dari memori HP
+        // Load Pengaturan dari LocalStorage
         let currentSoundFile = localStorage.getItem('selectedSound') || 'Notif01.mp3';
+        let currentTheme = localStorage.getItem('selectedTheme') || 'dark';
+        
+        document.body.setAttribute('data-theme', currentTheme);
         document.getElementById('sound-choice').value = currentSoundFile;
+        document.getElementById('theme-toggle').checked = (currentTheme === 'light');
 
         function toggleSettings() {
             const modal = document.getElementById('settings-modal');
             modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
         }
 
+        function previewTheme() {
+            const isLight = document.getElementById('theme-toggle').checked;
+            document.body.setAttribute('data-theme', isLight ? 'light' : 'dark');
+        }
+
         function saveSettings() {
             currentSoundFile = document.getElementById('sound-choice').value;
+            const isLight = document.getElementById('theme-toggle').checked;
+            currentTheme = isLight ? 'light' : 'dark';
+
             localStorage.setItem('selectedSound', currentSoundFile);
+            localStorage.setItem('selectedTheme', currentTheme);
             
-            // Tes suara saat disimpan
             const testAudio = new Audio(rawURL + currentSoundFile);
             testAudio.play();
             
@@ -174,33 +215,29 @@
             const statusDiv = document.getElementById('status-kirim');
             const ket = document.getElementById('keterangan').value;
 
-            // Putar suara yang dipilih dari GitHub
+            // Suara & Getar Instan
             const audio = new Audio(rawURL + currentSoundFile);
-            audio.play().catch(e => console.log("Izin audio diperlukan"));
-
+            audio.play().catch(() => {});
             if (navigator.vibrate) navigator.vibrate(100);
 
-            statusDiv.innerText = "Mengirim: " + decodedText;
-            statusDiv.className = "loading";
-            statusDiv.style.display = "block";
-            statusDiv.style.opacity = "1";
-
+            // Kirim data (Tanpa notifikasi "Mengirim" berwarna oranye)
             fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ket)}`, {
                 method: 'GET',
                 mode: 'no-cors'
             });
 
+            // Tampilkan Notifikasi Berhasil (Langsung Hijau)
+            statusDiv.innerText = "✔ TERKIRIM: " + decodedText;
+            statusDiv.style.display = "block";
+            statusDiv.style.opacity = "1";
+
             setTimeout(() => {
-                statusDiv.innerText = "✔ TERKIRIM: " + decodedText;
-                statusDiv.className = "success";
+                statusDiv.style.opacity = "0";
                 setTimeout(() => {
-                    statusDiv.style.opacity = "0";
-                    setTimeout(() => {
-                        statusDiv.style.display = "none";
-                        isProcessing = false;
-                    }, 500); 
-                }, 1500); 
-            }, 600);
+                    statusDiv.style.display = "none";
+                    isProcessing = false;
+                }, 500); 
+            }, 2000); 
         }
     </script>
 </body>
