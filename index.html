@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Digital - SMP Islam Az-Zahro</title>
+    <title>Absensi Digital</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
@@ -81,7 +81,7 @@
 
     <div id="status-kirim"></div>
 
-    <h3>Absensi Digital<br>SMP Islam Az-Zahro & SMK Az-Zahro</h3>
+    <h3>ABSENS DIGITAL<br>SMP Islam Az-Zahro & SMK Az-Zahro</h3>
     
     <select id="keterangan">
         <option value="●">HADIR</option>
@@ -132,7 +132,7 @@
             // LOGIKA PENGHILANGAN NOTIFIKASI
             setTimeout(() => {
                 // Ubah status menjadi Berhasil
-                statusDiv.innerText = "✅ TERCATAT: " + decodedText;
+                statusDiv.innerText = "✔ TERKIRIM: " + decodedText;
                 statusDiv.className = "success";
                 
                 // Tunggu 1.5 detik lalu hilangkan notifikasi sepenuhnya
