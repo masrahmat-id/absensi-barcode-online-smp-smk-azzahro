@@ -78,7 +78,7 @@
 
         #reader { width: 100%; border-radius: 18px; overflow: hidden; background: #000; }
 
-        /* --- MODAL SETTINGS DENGAN TOMBOL CLOSE --- */
+        /* MODAL SETTINGS */
         #settings-modal {
             display: none; position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%); background: var(--bg-card);
@@ -95,7 +95,8 @@
 
         .btn-close-modal {
             background: none; border: none; color: var(--text-main);
-            font-size: 24px; font-weight: bold; cursor: pointer; padding: 0 5px;
+            font-size: 30px; font-weight: bold; cursor: pointer; padding: 0 5px;
+            line-height: 1;
         }
 
         .setting-item { 
@@ -131,7 +132,7 @@
         <div id="settings-modal">
             <div class="modal-header">
                 <h3 style="margin:0; color:var(--primary);">⚙ Pengaturan</h3>
-                <button class="btn-close-modal" onclick="toggleSettings()">×</button>
+                <button class="btn-close-modal" onclick="cancelSettings()">×</button>
             </div>
             
             <label style="font-size: 11px; opacity: 0.6; display:block;">PILIH SUARA NOTIFIKASI:</label>
@@ -208,6 +209,7 @@
         }
         document.addEventListener("click", () => activateFullscreen(), { once: true });
 
+        // Terapkan setingan dari memori
         function applySettings() {
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || {
                 sound: 'Notif01.mp3', theme: 'dark', primary: '#2ecc71',
@@ -219,6 +221,7 @@
             document.documentElement.style.setProperty('--header-font-size', config.fontSize + 'rem');
             document.documentElement.style.setProperty('--header-text-color', config.textColor);
             document.documentElement.style.setProperty('--bg-body', config.bgColor);
+            
             document.getElementById('sound-choice').value = config.sound;
             document.getElementById('color-picker').value = config.primary;
             document.getElementById('range-logo').value = config.logoSize;
@@ -228,6 +231,7 @@
             document.getElementById('theme-toggle').checked = (config.theme === 'light');
         }
 
+        // Preview saat digeser
         function previewLayout() {
             document.documentElement.style.setProperty('--primary', document.getElementById('color-picker').value);
             document.documentElement.style.setProperty('--logo-size', document.getElementById('range-logo').value + 'px');
@@ -237,6 +241,13 @@
             document.body.setAttribute('data-theme', document.getElementById('theme-toggle').checked ? 'light' : 'dark');
         }
 
+        // Tombol Close (Keluar tanpa simpan)
+        function cancelSettings() {
+            applySettings(); // Kembalikan ke setingan lama
+            toggleSettings();
+        }
+
+        // Simpan Permanen
         function saveSettings() {
             const config = {
                 sound: document.getElementById('sound-choice').value,
