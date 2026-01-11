@@ -77,18 +77,14 @@
         select { flex-grow: 1; padding: 0 15px; font-weight: bold; font-size: 16px; }
         .btn-settings { width: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
-        /* AREA KAMERA YANG DISESUAIKAN */
         .scanner-box {
             width: 100%; background: var(--bg-card); padding: 8px;
             border-radius: 20px; border: 4px solid var(--primary); position: relative;
             box-sizing: border-box; overflow: hidden;
-            /* Memastikan kamera mendapat ruang utama */
-            flex-grow: 0;
         }
 
         #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; }
 
-        /* INPUT NAMA DI BAWAH KAMERA */
         .last-scan-container {
             margin-top: 15px;
             width: 100%;
@@ -99,7 +95,11 @@
             border: 2px solid var(--primary); border-radius: 15px;
             color: var(--primary); text-align: center; font-weight: 800;
             font-size: 20px; box-sizing: border-box; outline: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* NOTIFIKASI PETUNJUK */
+        .info-text {
+            font-size: 11px; opacity: 0.6; margin-top: 12px; line-height: 1.4;
         }
 
         #settings-modal {
@@ -117,9 +117,7 @@
         }
 
         .btn-close-modal { background: none; border: none; color: var(--text-main); font-size: 30px; font-weight: bold; cursor: pointer; line-height: 1; }
-
         .setting-item { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
-
         .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; font-weight: bold; border: none; border-radius: 12px; margin-top: 25px; cursor: pointer; }
 
         #status-kirim {
@@ -160,9 +158,10 @@
             <input type="text" id="last-name-display" placeholder="MENUNGGU SCAN..." readonly>
         </div>
         
-        <p id="fullscreen-info" style="font-size: 11px; opacity: 0.5; margin-top: 15px;">
-            Ketuk layar untuk Fullscreen
-        </p>
+        <div class="info-text">
+            <span id="fullscreen-info">Ketuk layar untuk Fullscreen</span><br>
+            <span id="fixed-info">Tampilan Layar Fixed & Kamera Aktif</span>
+        </div>
 
         <div id="settings-modal">
             <div class="modal-header">
@@ -199,10 +198,12 @@
         let wakeLock = null;
 
         async function stayAwake() { try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {} }
+        
         function openFullscreen() {
             const elem = document.documentElement;
             if (elem.requestFullscreen) elem.requestFullscreen();
             else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+            document.getElementById('fullscreen-info').innerText = "Mode Fullscreen Aktif";
             stayAwake();
         }
         document.body.addEventListener('click', openFullscreen, { once: true });
@@ -262,24 +263,19 @@
         const html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start({ facingMode: "environment" }, { 
             fps: 20, 
-            qrbox: { width: 250, height: 250 }, // Kotak scan di tengah
-            aspectRatio: 1.0 // Rasio kamera kotak sempurna
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0 
         }, (decodedText) => {
             if (isProcessing) return;
             isProcessing = true;
-            
             document.getElementById('last-name-display').value = decodedText;
-            
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
             new Audio(rawURL + config.sound).play().catch(() => {});
             if (navigator.vibrate) navigator.vibrate(100);
-
             fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(document.getElementById('keterangan').value)}`, { method: 'GET', mode: 'no-cors' });
-            
             const s = document.getElementById('status-kirim');
             s.innerText = "✔ TERKIRIM: " + decodedText;
             s.style.display = "block";
-            
             setTimeout(() => { s.style.display = "none"; isProcessing = false; }, 2000);
         });
     </script>
