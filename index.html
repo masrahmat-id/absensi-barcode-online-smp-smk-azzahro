@@ -53,7 +53,7 @@
 
         .header-container {
             display: flex; align-items: center; justify-content: center;
-            gap: 15px; margin-bottom: 15px;
+            gap: 15px; margin-bottom: 10px;
         }
 
         .header-container img {
@@ -63,6 +63,15 @@
         .header-container h3 {
             margin: 0; font-size: var(--header-font-size);
             line-height: 1.1; color: var(--header-text-color); font-weight: 800;
+        }
+
+        /* STYLE UNTUK WAKTU */
+        .datetime-display {
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
         }
 
         .controls-row {
@@ -97,6 +106,7 @@
             font-size: 20px; box-sizing: border-box; outline: none;
         }
 
+        /* MODAL PENGATURAN */
         #settings-modal {
             display: none; position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%); background: var(--bg-card);
@@ -112,9 +122,7 @@
         }
 
         .btn-close-modal { background: none; border: none; color: var(--text-main); font-size: 30px; font-weight: bold; cursor: pointer; line-height: 1; }
-
         .setting-item { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
-
         .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; font-weight: bold; border: none; border-radius: 12px; margin-top: 25px; cursor: pointer; }
 
         #status-kirim {
@@ -135,6 +143,8 @@
             <h3 id="text-header">ABSENSI DIGITAL<br>SMP ISLAM AZ-ZAHRO<br>SMK AZ-ZAHRO</h3>
             <img src="logo-smk-azzahro.png" alt="SMK">
         </div>
+
+        <div class="datetime-display" id="clock-display">Memuat Waktu...</div>
 
         <div class="controls-row">
             <select id="keterangan">
@@ -193,6 +203,27 @@
         let isProcessing = false;
         let wakeLock = null;
 
+        // --- FUNGSI UPDATE JAM ---
+        function updateClock() {
+            const now = new Date();
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+            const dayName = days[now.getDay()];
+            const dayDate = now.getDate();
+            const monthName = months[now.getMonth()];
+            const year = now.getFullYear();
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            document.getElementById('clock-display').innerText = 
+                `${dayName}, ${dayDate} ${monthName} ${year} | ${hours}:${minutes}:${seconds}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
         async function stayAwake() { 
             try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {} 
         }
@@ -200,16 +231,12 @@
         function openFullscreen() {
             const elem = document.documentElement;
             const info = document.getElementById('fullscreen-info');
-            
             if (elem.requestFullscreen) elem.requestFullscreen();
             else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-            
-            // Mengubah teks alih-alih menghilangkannya
             info.innerText = "Tampilan Terkunci (Fixed Mode)";
             info.style.opacity = "0.7";
             stayAwake();
         }
-
         document.body.addEventListener('click', openFullscreen, { once: true });
 
         function applySettings() {
@@ -223,7 +250,6 @@
             document.documentElement.style.setProperty('--header-font-size', config.fontSize + 'rem');
             document.documentElement.style.setProperty('--header-text-color', config.textColor);
             document.documentElement.style.setProperty('--bg-body', config.bgColor);
-            
             document.getElementById('sound-choice').value = config.sound;
             document.getElementById('color-picker').value = config.primary;
             document.getElementById('range-logo').value = config.logoSize;
