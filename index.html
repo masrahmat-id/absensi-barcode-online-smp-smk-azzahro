@@ -39,8 +39,9 @@
         body {
             font-family: 'Segoe UI', Roboto, sans-serif;
             display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            align-items: center; justify-content: flex-start; /* Ubah ke flex-start agar konten mulai dari atas */
             color: var(--text-main); transition: background-color 0.4s ease;
+            padding-top: 10px; /* Jarak aman dari atas layar */
         }
 
         .main-app {
@@ -48,12 +49,12 @@
             padding: 0 20px; box-sizing: border-box; text-align: center;
             touch-action: manipulation;
             display: flex; flex-direction: column; height: 100%;
-            justify-content: center;
+            justify-content: flex-start; /* Konten didorong ke atas */
         }
 
         .header-container {
             display: flex; align-items: center; justify-content: center;
-            gap: 15px; margin-bottom: 10px;
+            gap: 15px; margin-bottom: 5px; /* Kurangi margin bawah */
         }
 
         .header-container img {
@@ -63,15 +64,17 @@
         .header-container h3 {
             margin: 0; font-size: var(--header-font-size);
             line-height: 1.1; color: var(--header-text-color); font-weight: 800;
+            text-transform: uppercase; /* Memastikan teks sekolah kapital */
         }
 
-        /* STYLE UNTUK WAKTU */
+        /* STYLE UNTUK WAKTU - DIJADIKAN KAPITAL */
         .datetime-display {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-weight: bold;
             font-size: 14px;
             color: var(--text-main);
             letter-spacing: 0.5px;
+            text-transform: uppercase; /* Membuat Hari dan Tanggal Kapital */
         }
 
         .controls-row {
@@ -144,7 +147,7 @@
             <img src="logo-smk-azzahro.png" alt="SMK">
         </div>
 
-        <div class="datetime-display" id="clock-display">Memuat Waktu...</div>
+        <div class="datetime-display" id="clock-display">MEMUAT WAKTU...</div>
 
         <div class="controls-row">
             <select id="keterangan">
@@ -206,8 +209,8 @@
         // --- FUNGSI UPDATE JAM ---
         function updateClock() {
             const now = new Date();
-            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const days = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
+            const months = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
             
             const dayName = days[now.getDay()];
             const dayDate = now.getDate();
@@ -218,6 +221,7 @@
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
 
+            // Format Kapital sudah diatur di CSS text-transform dan Array di atas
             document.getElementById('clock-display').innerText = 
                 `${dayName}, ${dayDate} ${monthName} ${year} | ${hours}:${minutes}:${seconds}`;
         }
