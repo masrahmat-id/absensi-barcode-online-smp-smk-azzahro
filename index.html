@@ -50,8 +50,17 @@
             margin-bottom: 20px;
         }
 
-        .header-container img { width: 45px; height: 45px; object-fit: contain; }
-        .header-container h3 { margin: 0; font-size: 1rem; line-height: 1.2; }
+        .header-container img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+        }
+
+        .header-container h3 {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.2;
+        }
 
         .controls-row {
             display: flex;
@@ -63,108 +72,150 @@
         }
 
         select {
-            flex-grow: 1; height: 50px; padding: 0 15px;
-            background: var(--card-bg); color: var(--text-color);
-            border: 2px solid var(--border-color); border-radius: 12px;
-            font-size: 16px; outline: none;
+            flex-grow: 1;
+            height: 50px;
+            padding: 0 15px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
         }
 
         .btn-settings {
-            width: 50px; height: 50px; background: var(--card-bg);
-            color: var(--text-color); border: 2px solid var(--border-color);
-            border-radius: 12px; font-size: 20px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .scanner-box {
-            width: 100%; max-width: 400px; margin: 0 auto;
-            background: var(--card-bg); padding: 10px;
-            border-radius: 20px; border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
             position: relative;
         }
 
-        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: black; }
-
-        .scan-line {
-            width: 80%; height: 3px; background-color: var(--primary);
-            position: absolute; left: 10%; z-index: 10;
-            box-shadow: 0 0 12px var(--primary);
-            animation: scanAnim 2.5s infinite ease-in-out;
-            pointer-events: none; display: none;
+        #reader { 
+            width: 100%; 
+            border-radius: 15px; 
+            overflow: hidden; 
+            background: black; 
         }
 
-        @keyframes scanAnim { 0% { top: 20%; } 50% { top: 80%; } 100% { top: 20%; } }
-        #reader:not(:empty) + .scan-line { display: block; }
+        .scan-line {
+            width: 80%; 
+            height: 3px;
+            background-color: var(--primary);
+            position: absolute;
+            left: 10%;
+            z-index: 10;
+            box-shadow: 0 0 12px var(--primary);
+            animation: scanAnim 2.5s infinite ease-in-out;
+            pointer-events: none;
+            display: none;
+        }
+
+        @keyframes scanAnim {
+            0% { top: 20%; }
+            50% { top: 80%; }
+            100% { top: 20%; }
+        }
+
+        #reader:not(:empty) + .scan-line {
+            display: block;
+        }
+
         #reader__dashboard, #reader__camera_selection { display: none !important; }
 
         #status-kirim {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 400px; padding: 15px; border-radius: 12px;
-            font-weight: bold; z-index: 9999; display: none;
-            background-color: var(--success); color: white; border: 1px solid white;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            max-width: 400px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            z-index: 9999;
+            display: none;
+            background-color: var(--success);
+            color: white;
+            border: 1px solid white;
+            transition: opacity 0.5s ease;
         }
 
-        /* Modal Settings */
         #settings-modal {
-            display: none; position: fixed; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); background: var(--card-bg);
-            padding: 20px; border-radius: 15px; border: 2px solid var(--primary);
-            z-index: 1002; width: 85%; max-width: 320px;
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid var(--primary);
+            z-index: 1002;
+            width: 85%;
+            max-width: 320px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
 
-        /* Banner Instalasi */
-        #install-banner {
-            display: none; position: fixed; bottom: 20px; left: 50%;
-            transform: translateX(-50%); width: 90%; max-width: 400px;
-            background: var(--card-bg); border: 2px solid var(--primary);
-            padding: 15px; border-radius: 15px; z-index: 10000;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        .btn-save {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            margin-top: 20px;
+            cursor: pointer;
         }
 
-        #install-loader {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 10001;
-            flex-direction: column; align-items: center; justify-content: center;
+        .creator-info {
+            margin-top: 15px;
+            font-size: 10px;
+            color: rgba(128, 128, 128, 0.5);
+            letter-spacing: 0.5px;
         }
-
-        .spinner {
-            width: 50px; height: 50px; border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary); border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body data-theme="dark">
 
     <div id="status-kirim"></div>
 
-    <div id="install-banner">
-        <p style="margin: 0 0 10px 0; font-size: 14px;">Instal Aplikasi Absensi Az-Zahro?</p>
-        <button id="btn-install-app" style="background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%;">PASANG SEKARANG</button>
-    </div>
-
-    <div id="install-loader">
-        <div class="spinner"></div>
-        <p style="color: white; margin-top: 15px;">Menyiapkan Aplikasi...</p>
-    </div>
-
     <div id="settings-modal">
         <h4 style="margin:0 0 15px 0">Pengaturan</h4>
+        <label style="font-size: 12px; color: gray; display:block; text-align:left;">Suara Notifikasi:</label>
         <select id="sound-choice" style="width:100%; border-color:var(--primary); margin-bottom:15px;">
             <option value="Notif01.mp3">Notif 01</option>
             <option value="Notif02.mp3">Notif 02</option>
             <option value="Notif03.mp3">Notif 03</option>
             <option value="Done.mp3">Done</option>
             <option value="Mission-success.mp3">Mission Success</option>
+            <option value="Success-fanfare-trumpets.mp3">Success Fanfare</option>
+            <option value="Yayyy.mp3">Yayyy!</option>
         </select>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span>Mode Terang</span>
-            <input type="checkbox" id="theme-toggle" onchange="previewTheme()">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <span style="font-size: 15px;">Mode Terang</span>
+            <input type="checkbox" id="theme-toggle" onchange="previewTheme()" style="width:18px; height:18px;">
         </div>
-        <button style="width:100%; padding:10px; background:var(--primary); color:white; border:none; border-radius:8px; margin-top:15px;" onclick="saveSettings()">SIMPAN</button>
+        <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
+        <div class="creator-info">Created by ops: Rahmattullah</div>
     </div>
 
     <div class="header-container">
@@ -175,10 +226,10 @@
     
     <div class="controls-row">
         <select id="keterangan">
-            <option value="●">HADIR</option>
-            <option value="I">IZIN</option>
-            <option value="S">SAKIT</option>
-            <option value="A">ALPA</option>
+            <option value="●">🟢 HADIR</option>
+            <option value="I">🟡 IZIN</option>
+            <option value="S">🔵 SAKIT</option>
+            <option value="A">🔴 ALPA</option>
         </select>
         <div class="btn-settings" onclick="toggleSettings()">☰</div>
     </div>
@@ -189,50 +240,27 @@
     </div>
 
     <script>
-        // PWA & Update Logic
-        let deferredPrompt;
+        // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then(reg => {
-                    // Cek update file sw.js secara berkala
-                    reg.onupdatefound = () => {
-                        const installingWorker = reg.installing;
-                        installingWorker.onstatechange = () => {
-                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                if(confirm("Versi baru tersedia! Muat ulang sekarang?")) {
-                                    window.location.reload();
-                                }
-                            }
-                        };
-                    };
+                    console.log('SW Registered!', reg);
+                }).catch(err => {
+                    console.log('SW Registration Failed', err);
                 });
             });
         }
 
-        // Tangkap event instalasi
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('install-banner').style.display = 'block';
-        });
-
-        document.getElementById('btn-install-app').addEventListener('click', async () => {
-            if (deferredPrompt) {
-                document.getElementById('install-banner').style.display = 'none';
-                document.getElementById('install-loader').style.display = 'flex';
-                setTimeout(async () => {
-                    document.getElementById('install-loader').style.display = 'none';
-                    deferredPrompt.prompt();
-                    deferredPrompt = null;
-                }, 1500);
-            }
-        });
-
-        // Kontrol Aplikasi (Scan & UI)
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwCXbDTuaFkN7GlcXJxaFgDaKPEp2G9vySF1IKfWxUCTuEOCYt39nMmlEmI25pz4PSd/exec';
         const rawURL = 'https://github.com/masrahmat-id/absensi/raw/main/';
         let isProcessing = false;
+
         let currentSoundFile = localStorage.getItem('selectedSound') || 'Notif01.mp3';
+        let currentTheme = localStorage.getItem('selectedTheme') || 'dark';
+        
+        document.body.setAttribute('data-theme', currentTheme);
+        document.getElementById('sound-choice').value = currentSoundFile;
+        document.getElementById('theme-toggle').checked = (currentTheme === 'light');
 
         function toggleSettings() {
             const modal = document.getElementById('settings-modal');
@@ -246,24 +274,42 @@
 
         function saveSettings() {
             currentSoundFile = document.getElementById('sound-choice').value;
+            currentTheme = document.getElementById('theme-toggle').checked ? 'light' : 'dark';
             localStorage.setItem('selectedSound', currentSoundFile);
-            localStorage.setItem('selectedTheme', document.getElementById('theme-toggle').checked ? 'light' : 'dark');
+            localStorage.setItem('selectedTheme', currentTheme);
             new Audio(rawURL + currentSoundFile).play();
             toggleSettings();
         }
 
         const html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, (decodedText) => {
-            if (isProcessing) return;
+        html5QrCode.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, onScanSuccess);
+
+        function onScanSuccess(decodedText) {
+            if (isProcessing) return; 
             isProcessing = true;
-            new Audio(rawURL + currentSoundFile).play().catch(() => {});
-            fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(document.getElementById('keterangan').value)}`, { method: 'GET', mode: 'no-cors' });
-            
+
             const statusDiv = document.getElementById('status-kirim');
+            const ket = document.getElementById('keterangan').value;
+
+            new Audio(rawURL + currentSoundFile).play().catch(() => {});
+            if (navigator.vibrate) navigator.vibrate(100);
+
+            fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ket)}`, {
+                method: 'GET', mode: 'no-cors'
+            });
+
             statusDiv.innerText = "✔ TERKIRIM: " + decodedText;
             statusDiv.style.display = "block";
-            setTimeout(() => { statusDiv.style.display = "none"; isProcessing = false; }, 2500);
-        });
+            statusDiv.style.opacity = "1";
+
+            setTimeout(() => {
+                statusDiv.style.opacity = "0";
+                setTimeout(() => {
+                    statusDiv.style.display = "none";
+                    isProcessing = false;
+                }, 500); 
+            }, 2000); 
+        }
     </script>
 </body>
 </html>
