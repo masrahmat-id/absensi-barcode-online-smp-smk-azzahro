@@ -65,7 +65,6 @@
             line-height: 1.1; color: var(--header-text-color); font-weight: 800;
         }
 
-        /* STYLE UNTUK WAKTU */
         .datetime-display {
             margin-bottom: 10px;
             font-weight: bold;
@@ -90,9 +89,18 @@
             width: 100%; background: var(--bg-card); padding: 8px;
             border-radius: 20px; border: 4px solid var(--primary); position: relative;
             box-sizing: border-box; overflow: hidden;
+            /* Tambahan untuk menyesuaikan tinggi visual */
+            min-height: 280px; 
+            display: flex;
+            align-items: center;
         }
 
         #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; }
+        
+        /* Modifikasi video agar mengisi area dengan lebih baik */
+        #reader video {
+            object-fit: cover !important;
+        }
 
         .last-scan-container {
             margin-top: 15px;
@@ -106,7 +114,6 @@
             font-size: 20px; box-sizing: border-box; outline: none;
         }
 
-        /* MODAL PENGATURAN */
         #settings-modal {
             display: none; position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%); background: var(--bg-card);
@@ -203,7 +210,6 @@
         let isProcessing = false;
         let wakeLock = null;
 
-        // --- FUNGSI UPDATE JAM ---
         function updateClock() {
             const now = new Date();
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -291,10 +297,18 @@
 
         applySettings();
         const html5QrCode = new Html5Qrcode("reader");
+        
+        // --- PENYESUAIAN TINGGI DAN POSISI KAMERA ---
         html5QrCode.start({ facingMode: "environment" }, { 
-            fps: 20, 
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.0 
+            fps: 25, 
+            // Meningkatkan lebar dan tinggi area scan (qrbox) 
+            // serta mengatur posisi agar lebih seimbang
+            qrbox: { width: 280, height: 280 },
+            aspectRatio: 1.0,
+            // Memaksa video untuk mengisi area container
+            videoConstraints: {
+                aspectRatio: 1.0
+            }
         }, (decodedText) => {
             if (isProcessing) return;
             isProcessing = true;
