@@ -67,6 +67,7 @@
         .datetime-display {
             margin-bottom: 10px; font-weight: bold; font-size: 14px;
             color: var(--text-main); letter-spacing: 0.5px;
+            text-transform: uppercase; /* Menjadikan teks kapital via CSS */
         }
 
         .controls-row { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -146,7 +147,7 @@
             <img src="logo-smk-azzahro.png" alt="SMK">
         </div>
 
-        <div class="datetime-display" id="clock-display">Memuat Waktu...</div>
+        <div class="datetime-display" id="clock-display">MEMUAT WAKTU...</div>
 
         <div class="controls-row">
             <select id="keterangan">
@@ -209,8 +210,11 @@
             const now = new Date();
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            document.getElementById('clock-display').innerText = 
-                `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            
+            const timeString = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            
+            // Menampilkan dengan huruf kapital semua
+            document.getElementById('clock-display').innerText = timeString.toUpperCase();
         }
         setInterval(updateClock, 1000); updateClock();
 
