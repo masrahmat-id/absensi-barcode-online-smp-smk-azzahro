@@ -34,7 +34,6 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* Header Logo */
         .header-container {
             display: flex;
             align-items: center;
@@ -55,7 +54,6 @@
             line-height: 1.2;
         }
 
-        /* Baris Kontrol */
         .controls-row {
             display: flex;
             align-items: center;
@@ -91,7 +89,7 @@
             justify-content: center;
         }
 
-        /* Kotak Scanner & Animasi Garis */
+        /* --- BAGIAN SCANNER OVERLAY --- */
         .scanner-box {
             width: 100%;
             max-width: 400px;
@@ -101,7 +99,6 @@
             border-radius: 20px;
             border: 1px solid var(--border-color);
             position: relative;
-            overflow: hidden;
         }
 
         #reader { 
@@ -111,27 +108,35 @@
             background: black; 
         }
 
-        #reader__dashboard, #reader__camera_selection { display: none !important; }
-
+        /* Styling Garis Scan Khusus di dalam QR Box */
         .scan-line {
-            width: calc(100% - 20px);
+            width: 250px; /* Sesuai qrbox */
             height: 3px;
             background-color: var(--success);
             position: absolute;
-            left: 10px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 10;
             box-shadow: 0 0 12px var(--success);
             animation: scanAnim 2.5s infinite ease-in-out;
             pointer-events: none;
+            display: none; /* Akan muncul otomatis saat kamera aktif */
         }
 
+        /* Koordinat Gerak Garis (disesuaikan agar pas di tengah siku-siku) */
         @keyframes scanAnim {
-            0% { top: 15px; }
-            50% { top: calc(100% - 20px); }
-            100% { top: 15px; }
+            0% { top: calc(50% - 125px); }
+            50% { top: calc(50% + 125px); }
+            100% { top: calc(50% - 125px); }
         }
 
-        /* Notifikasi */
+        /* Tampilkan garis ketika scanner-box memiliki konten */
+        #reader:not(:empty) + .scan-line {
+            display: block;
+        }
+
+        #reader__dashboard, #reader__camera_selection { display: none !important; }
+
         #status-kirim {
             position: fixed;
             top: 20px;
@@ -150,7 +155,6 @@
             transition: opacity 0.5s ease;
         }
 
-        /* Modal Settings */
         #settings-modal {
             display: none;
             position: fixed;
@@ -205,7 +209,7 @@
 
     <div class="header-container">
         <img src="logo-smp-azzahro.png" alt="Logo SMP">
-        <h3>ABSENSI DIGITAL<br>SMP & SMK Az-Zahro</h3>
+        <h3>ABSENSI DIGITAL<br>SMP & SMK AZ-ZAHRO</h3>
         <img src="logo-smk-azzahro.png" alt="Logo SMK">
     </div>
     
