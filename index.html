@@ -12,7 +12,6 @@
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
-        /* Variabel Dasar */
         :root {
             --primary: #2ecc71;
             --bg-body: #121212;
@@ -44,7 +43,7 @@
             align-items: center;
             justify-content: center;
             color: var(--text-main);
-            transition: background-color 0.4s ease, color 0.4s ease;
+            transition: background-color 0.4s ease;
         }
 
         .main-app {
@@ -55,7 +54,6 @@
             text-align: center;
         }
 
-        /* Header Layout */
         .header-container {
             display: flex;
             align-items: center;
@@ -68,7 +66,6 @@
             width: var(--logo-size);
             height: var(--logo-size);
             object-fit: contain;
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
         }
 
         .header-container h3 {
@@ -79,7 +76,6 @@
             font-weight: 800;
         }
 
-        /* Controls */
         .controls-row {
             display: flex;
             gap: 12px;
@@ -92,13 +88,11 @@
             border: 2px solid var(--primary);
             border-radius: 15px;
             height: 55px;
-            font-size: 16px;
         }
 
         select { flex-grow: 1; padding: 0 15px; font-weight: bold; }
         .btn-settings { width: 55px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; }
 
-        /* Scanner Area */
         .scanner-box {
             width: 100%;
             background: var(--bg-card);
@@ -106,12 +100,10 @@
             border-radius: 25px;
             border: 4px solid var(--primary);
             position: relative;
-            box-sizing: border-box;
         }
 
         #reader { width: 100%; border-radius: 18px; overflow: hidden; background: #000; }
 
-        /* Settings Modal */
         #settings-modal {
             display: none; 
             position: fixed; top: 50%; left: 50%;
@@ -120,17 +112,14 @@
             padding: 20px; border-radius: 20px; 
             border: 3px solid var(--primary);
             z-index: 10000; width: 90%; max-width: 350px;
-            max-height: 80vh; overflow-y: auto;
+            max-height: 85vh; overflow-y: auto;
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
         .setting-item { 
             display: flex; justify-content: space-between; 
             align-items: center; margin-top: 15px;
-            font-size: 14px;
         }
-
-        .setting-item input[type="range"] { width: 100px; }
 
         .btn-save { 
             width: 100%; padding: 15px; 
@@ -144,7 +133,7 @@
             position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
             width: 80%; padding: 15px; border-radius: 15px;
             z-index: 10001; display: none; background-color: var(--primary);
-            color: white; border: 2px solid white; text-align: center; font-weight: bold;
+            color: white; border: 2px solid white; text-align: center;
         }
     </style>
 </head>
@@ -154,30 +143,33 @@
 
     <div class="main-app">
         <div class="header-container">
-            <img src="logo-smp-azzahro.png" alt="SMP" id="img-logo1">
+            <img src="logo-smp-azzahro.png" alt="SMP">
             <h3 id="text-header">ABSENSI DIGITAL<br>SMP ISLAM AZ-ZAHRO<br>SMK AZ-ZAHRO</h3>
-            <img src="logo-smk-azzahro.png" alt="SMK" id="img-logo2">
+            <img src="logo-smk-azzahro.png" alt="SMK">
         </div>
 
         <div id="settings-modal">
-            <h3 style="margin-top:0; color:var(--primary); text-align: center;">Pengaturan</h3>
+            <h3 style="margin-top:0; color:var(--primary); text-align: center;">⚙ Pengaturan</h3>
             
-            <label style="font-size: 11px; opacity: 0.6;">SUARA NOTIFIKASI:</label>
+            <label style="font-size: 11px; opacity: 0.6; display:block; margin-top:10px;">PILIH SUARA NOTIFIKASI:</label>
             <select id="sound-choice" style="width:100%; height: 40px; margin-bottom:10px;">
                 <option value="Notif01.mp3">Notif 01</option>
                 <option value="Notif02.mp3">Notif 02</option>
+                <option value="Notif03.mp3">Notif 03</option>
                 <option value="Done.mp3">Done</option>
+                <option value="Mission-success.mp3">Mission Success</option>
+                <option value="Success-fanfare-trumpets.mp3">Success Fanfare</option>
                 <option value="Yayyy.mp3">Yayyy...!!</option>
             </select>
 
             <div class="setting-item">
                 <span>Ukuran Logo</span>
-                <input type="range" id="range-logo" min="40" max="120" oninput="previewLayout()">
+                <input type="range" id="range-logo" min="40" max="110" oninput="previewLayout()">
             </div>
 
             <div class="setting-item">
                 <span>Ukuran Tulisan</span>
-                <input type="range" id="range-font" min="0.5" max="1.5" step="0.1" oninput="previewLayout()">
+                <input type="range" id="range-font" min="0.5" max="1.5" step="0.05" oninput="previewLayout()">
             </div>
 
             <div class="setting-item">
@@ -191,7 +183,7 @@
             </div>
 
             <div class="setting-item">
-                <span>Warna Tema (Garis)</span>
+                <span>Warna Garis Tema</span>
                 <input type="color" id="color-picker" oninput="previewLayout()">
             </div>
 
@@ -200,7 +192,7 @@
                 <input type="checkbox" id="theme-toggle" onchange="previewLayout()">
             </div>
 
-            <button class="btn-save" onclick="saveSettings()">SIMPAN PERMANEN</button>
+            <button class="btn-save" onclick="saveSettings()">SIMPAN SEMUA</button>
         </div>
 
         <div class="controls-row">
@@ -218,7 +210,7 @@
             <div class="scan-line" style="width: 80%; height: 3px; background-color: var(--primary); position: absolute; left: 10%; z-index: 10; animation: scanAnim 3s infinite ease-in-out;"></div>
         </div>
         
-        <p style="font-size: 11px; opacity: 0.5; margin-top: 20px;">Sentuh layar untuk Fullscreen</p>
+        <p style="font-size: 11px; opacity: 0.5; margin-top: 20px;">Sentuh layar untuk sembunyikan jam/sinyal</p>
     </div>
 
     <script>
@@ -226,7 +218,6 @@
         const rawURL = 'https://github.com/masrahmat-id/absensi/raw/main/';
         let isProcessing = false;
 
-        // --- 1. FULLSCREEN ---
         function activateFullscreen() {
             const el = document.documentElement;
             if (el.requestFullscreen) el.requestFullscreen();
@@ -234,26 +225,17 @@
         }
         document.addEventListener("click", () => activateFullscreen(), { once: true });
 
-        // --- 2. LOGIKA SETTINGS ---
         function applySettings() {
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || {
-                sound: 'Notif01.mp3',
-                theme: 'dark',
-                primary: '#2ecc71',
-                logoSize: '65',
-                fontSize: '0.9',
-                textColor: '#2ecc71',
-                bgColor: '#121212'
+                sound: 'Notif01.mp3', theme: 'dark', primary: '#2ecc71',
+                logoSize: '65', fontSize: '0.9', textColor: '#2ecc71', bgColor: '#121212'
             };
-
             document.body.setAttribute('data-theme', config.theme);
             document.documentElement.style.setProperty('--primary', config.primary);
             document.documentElement.style.setProperty('--logo-size', config.logoSize + 'px');
             document.documentElement.style.setProperty('--header-font-size', config.fontSize + 'rem');
             document.documentElement.style.setProperty('--header-text-color', config.textColor);
             document.documentElement.style.setProperty('--bg-body', config.bgColor);
-
-            // Set Form Values
             document.getElementById('sound-choice').value = config.sound;
             document.getElementById('color-picker').value = config.primary;
             document.getElementById('range-logo').value = config.logoSize;
@@ -264,19 +246,12 @@
         }
 
         function previewLayout() {
-            const primary = document.getElementById('color-picker').value;
-            const logoSize = document.getElementById('range-logo').value;
-            const fontSize = document.getElementById('range-font').value;
-            const textColor = document.getElementById('color-text').value;
-            const bgColor = document.getElementById('color-bg').value;
-            const isLight = document.getElementById('theme-toggle').checked;
-
-            document.documentElement.style.setProperty('--primary', primary);
-            document.documentElement.style.setProperty('--logo-size', logoSize + 'px');
-            document.documentElement.style.setProperty('--header-font-size', fontSize + 'rem');
-            document.documentElement.style.setProperty('--header-text-color', textColor);
-            document.documentElement.style.setProperty('--bg-body', bgColor);
-            document.body.setAttribute('data-theme', isLight ? 'light' : 'dark');
+            document.documentElement.style.setProperty('--primary', document.getElementById('color-picker').value);
+            document.documentElement.style.setProperty('--logo-size', document.getElementById('range-logo').value + 'px');
+            document.documentElement.style.setProperty('--header-font-size', document.getElementById('range-font').value + 'rem');
+            document.documentElement.style.setProperty('--header-text-color', document.getElementById('color-text').value);
+            document.documentElement.style.setProperty('--bg-body', document.getElementById('color-bg').value);
+            document.body.setAttribute('data-theme', document.getElementById('theme-toggle').checked ? 'light' : 'dark');
         }
 
         function saveSettings() {
@@ -299,21 +274,15 @@
             m.style.display = m.style.display === 'block' ? 'none' : 'block';
         }
 
-        // --- 3. SCANNER ---
         applySettings();
         const html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, (decodedText) => {
             if (isProcessing) return;
             isProcessing = true;
-            
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
             new Audio(rawURL + config.sound).play().catch(() => {});
             if (navigator.vibrate) navigator.vibrate(100);
-
-            fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(document.getElementById('keterangan').value)}`, { 
-                method: 'GET', mode: 'no-cors' 
-            });
-
+            fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(document.getElementById('keterangan').value)}`, { method: 'GET', mode: 'no-cors' });
             const s = document.getElementById('status-kirim');
             s.innerText = "✔ BERHASIL: " + decodedText;
             s.style.display = "block";
