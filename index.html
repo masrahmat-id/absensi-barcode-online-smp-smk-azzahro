@@ -32,9 +32,12 @@
             margin: 0;
             padding: 20px;
             transition: background 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Header dengan Logo */
+        /* Header Logo Tetap di Atas */
         .header-container {
             display: flex;
             align-items: center;
@@ -55,16 +58,22 @@
             line-height: 1.2;
         }
 
+        /* Ikon Pengaturan Pindah ke Pojok Kanan Bawah */
         .settings-icon {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            font-size: 26px;
             cursor: pointer;
             z-index: 1001;
-            background: rgba(128,128,128,0.2);
-            padding: 8px;
+            background: var(--primary);
+            color: white;
+            padding: 12px;
             border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #settings-modal {
@@ -80,7 +89,7 @@
             z-index: 1002;
             width: 85%;
             max-width: 320px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
 
         #status-kirim {
@@ -122,6 +131,7 @@
             color: var(--text-color);
             border: 1px solid var(--primary);
             border-radius: 8px;
+            font-size: 16px;
         }
 
         .btn-save {
@@ -130,6 +140,7 @@
             font-weight: bold;
             border: none;
             margin-top: 20px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -139,7 +150,7 @@
 
     <div id="settings-modal">
         <h4 style="margin:0 0 15px 0">Pengaturan</h4>
-        <label style="font-size: 12px; color: gray;">Pilih Suara:</label>
+        <label style="font-size: 12px; color: gray;">Pilih Suara Notifikasi:</label>
         <select id="sound-choice">
             <option value="Done.mp3">Done</option>
             <option value="Mission-success.mp3">Mission Success</option>
@@ -149,11 +160,11 @@
             <option value="Success-fanfare-trumpets.mp3">Success Fanfare</option>
             <option value="Yayyy.mp3">Yayyy!</option>
         </select>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
-            <span style="font-size: 14px;">Mode Terang</span>
-            <input type="checkbox" id="theme-toggle" onchange="previewTheme()">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+            <span style="font-size: 15px;">Mode Terang</span>
+            <input type="checkbox" id="theme-toggle" onchange="previewTheme()" style="width:20px; height:20px;">
         </div>
-        <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
+        <button class="btn-save" onclick="saveSettings()">SIMPAN & TES SUARA</button>
     </div>
 
     <div id="status-kirim"></div>
@@ -164,7 +175,7 @@
         <img src="logo-smk-azzahro.png" alt="Logo SMK">
     </div>
     
-    <select id="keterangan" style="max-width: 420px; margin-bottom: 20px;">
+    <select id="keterangan" style="max-width: 420px; margin-bottom: 20px; height: 50px;">
         <option value="●">HADIR</option>
         <option value="I">IZIN</option>
         <option value="S">SAKIT</option>
@@ -202,6 +213,8 @@
             currentTheme = document.getElementById('theme-toggle').checked ? 'light' : 'dark';
             localStorage.setItem('selectedSound', currentSoundFile);
             localStorage.setItem('selectedTheme', currentTheme);
+            
+            // Putar suara sebagai konfirmasi
             new Audio(rawURL + currentSoundFile).play();
             toggleSettings();
         }
@@ -216,13 +229,16 @@
             const statusDiv = document.getElementById('status-kirim');
             const ket = document.getElementById('keterangan').value;
 
+            // Suara & Getar
             new Audio(rawURL + currentSoundFile).play().catch(() => {});
             if (navigator.vibrate) navigator.vibrate(100);
 
+            // Kirim ke Google Sheets
             fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ket)}`, {
                 method: 'GET', mode: 'no-cors'
             });
 
+            // Notifikasi Berhasil
             statusDiv.innerText = "✔ TERKIRIM: " + decodedText;
             statusDiv.style.display = "block";
             statusDiv.style.opacity = "1";
