@@ -39,22 +39,21 @@
         body {
             font-family: 'Segoe UI', Roboto, sans-serif;
             display: flex; flex-direction: column;
-            align-items: center; justify-content: flex-start; /* Ubah ke flex-start agar konten mulai dari atas */
+            align-items: center; justify-content: flex-start;
             color: var(--text-main); transition: background-color 0.4s ease;
-            padding-top: 10px; /* Jarak aman dari atas layar */
         }
 
         .main-app {
             width: 100%; max-width: 400px;
-            padding: 0 20px; box-sizing: border-box; text-align: center;
-            touch-action: manipulation;
-            display: flex; flex-direction: column; height: 100%;
-            justify-content: flex-start; /* Konten didorong ke atas */
+            padding: 25px 20px; /* Jarak atas disesuaikan agar tidak terlalu mentok */
+            box-sizing: border-box; text-align: center;
+            display: flex; flex-direction: column; 
+            height: 100vh;
         }
 
         .header-container {
             display: flex; align-items: center; justify-content: center;
-            gap: 15px; margin-bottom: 5px; /* Kurangi margin bawah */
+            gap: 15px; margin-bottom: 10px;
         }
 
         .header-container img {
@@ -64,17 +63,17 @@
         .header-container h3 {
             margin: 0; font-size: var(--header-font-size);
             line-height: 1.1; color: var(--header-text-color); font-weight: 800;
-            text-transform: uppercase; /* Memastikan teks sekolah kapital */
+            text-transform: uppercase;
         }
 
-        /* STYLE UNTUK WAKTU - DIJADIKAN KAPITAL */
         .datetime-display {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-main);
             letter-spacing: 0.5px;
-            text-transform: uppercase; /* Membuat Hari dan Tanggal Kapital */
+            text-transform: uppercase;
+            opacity: 0.9;
         }
 
         .controls-row {
@@ -90,16 +89,21 @@
         .btn-settings { width: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
 
         .scanner-box {
-            width: 100%; background: var(--bg-card); padding: 8px;
+            width: 100%; 
+            flex-grow: 1; /* Membuat scanner mengambil ruang yang tersedia */
+            max-height: 350px; /* Batas maksimal tinggi scanner */
+            background: var(--bg-card); padding: 8px;
             border-radius: 20px; border: 4px solid var(--primary); position: relative;
             box-sizing: border-box; overflow: hidden;
+            margin-bottom: 15px;
+            display: flex; align-items: center;
         }
 
         #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; }
 
         .last-scan-container {
-            margin-top: 15px;
             width: 100%;
+            margin-bottom: 10px;
         }
 
         #last-name-display {
@@ -109,6 +113,8 @@
             font-size: 20px; box-sizing: border-box; outline: none;
         }
 
+        #fullscreen-info { font-size: 11px; opacity: 0.5; margin-bottom: 10px; }
+
         /* MODAL PENGATURAN */
         #settings-modal {
             display: none; position: fixed; top: 50%; left: 50%;
@@ -116,7 +122,6 @@
             padding: 25px; border-radius: 20px; border: 3px solid var(--primary);
             z-index: 10000; width: 90%; max-width: 350px;
             max-height: 85vh; overflow-y: auto; box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            touch-action: pan-y;
         }
 
         .modal-header {
@@ -168,16 +173,13 @@
             <input type="text" id="last-name-display" placeholder="MENUNGGU SCAN..." readonly>
         </div>
         
-        <p id="fullscreen-info" style="font-size: 11px; opacity: 0.5; margin-top: 15px;">
-            Ketuk layar untuk Fullscreen
-        </p>
+        <p id="fullscreen-info">Ketuk layar untuk Fullscreen</p>
 
         <div id="settings-modal">
             <div class="modal-header">
                 <h3 style="margin:0; color:var(--primary);">⚙ Pengaturan</h3>
                 <button class="btn-close-modal" onclick="cancelSettings()">×</button>
             </div>
-            
             <label style="font-size: 11px; opacity: 0.6; display:block;">SUARA NOTIFIKASI:</label>
             <select id="sound-choice" style="width:100%; height: 40px; margin-bottom:10px; border-radius: 8px;">
                 <option value="Notif01.mp3">Notif 01</option>
@@ -188,14 +190,12 @@
                 <option value="Success-fanfare-trumpets.mp3">Success Fanfare</option>
                 <option value="Yayyy.mp3">Yayyy...!!</option>
             </select>
-
             <div class="setting-item"><span>Ukuran Logo</span><input type="range" id="range-logo" min="40" max="110" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Ukuran Tulisan</span><input type="range" id="range-font" min="0.5" max="1.5" step="0.05" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Warna Tulisan</span><input type="color" id="color-text" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Warna Latar</span><input type="color" id="color-bg" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Warna Garis Tema</span><input type="color" id="color-picker" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Mode Terang</span><input type="checkbox" id="theme-toggle" onchange="previewLayout()"></div>
-
             <button class="btn-save" onclick="saveSettings()">SIMPAN SEMUA</button>
         </div>
     </div>
@@ -206,24 +206,12 @@
         let isProcessing = false;
         let wakeLock = null;
 
-        // --- FUNGSI UPDATE JAM ---
         function updateClock() {
             const now = new Date();
             const days = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
             const months = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
-            
-            const dayName = days[now.getDay()];
-            const dayDate = now.getDate();
-            const monthName = months[now.getMonth()];
-            const year = now.getFullYear();
-            
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            // Format Kapital sudah diatur di CSS text-transform dan Array di atas
             document.getElementById('clock-display').innerText = 
-                `${dayName}, ${dayDate} ${monthName} ${year} | ${hours}:${minutes}:${seconds}`;
+                `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
         }
         setInterval(updateClock, 1000);
         updateClock();
@@ -234,11 +222,8 @@
 
         function openFullscreen() {
             const elem = document.documentElement;
-            const info = document.getElementById('fullscreen-info');
             if (elem.requestFullscreen) elem.requestFullscreen();
-            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-            info.innerText = "Tampilan Terkunci (Fixed Mode)";
-            info.style.opacity = "0.7";
+            document.getElementById('fullscreen-info').innerText = "Tampilan Terkunci (Fixed Mode)";
             stayAwake();
         }
         document.body.addEventListener('click', openFullscreen, { once: true });
@@ -272,7 +257,6 @@
             document.body.setAttribute('data-theme', document.getElementById('theme-toggle').checked ? 'light' : 'dark');
         }
 
-        function cancelSettings() { applySettings(); toggleSettings(); }
         function saveSettings() {
             const config = {
                 sound: document.getElementById('sound-choice').value,
@@ -305,7 +289,6 @@
             document.getElementById('last-name-display').value = decodedText;
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
             new Audio(rawURL + config.sound).play().catch(() => {});
-            if (navigator.vibrate) navigator.vibrate(100);
             fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(document.getElementById('keterangan').value)}`, { method: 'GET', mode: 'no-cors' });
             const s = document.getElementById('status-kirim');
             s.innerText = "✔ TERKIRIM: " + decodedText;
