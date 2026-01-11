@@ -1,14 +1,14 @@
 {
-  "short_name": "Absensi",
+  "short_name": "Absensi Az-Zahro",
   "name": "Absensi Digital Az-Zahro",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1067/1067357.png",
+      "src": "https://github.com/masrahmat-id/absensi/raw/main/icon-absensi-azzahro%20(1).png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1067/1067357.png",
+      "src": "https://github.com/masrahmat-id/absensi/raw/main/icon-absensi-azzahro%20(1).png",
       "type": "image/png",
       "sizes": "512x512"
     }
