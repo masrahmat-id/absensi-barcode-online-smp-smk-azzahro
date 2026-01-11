@@ -6,7 +6,7 @@
     <title>Absensi Digital - Az-Zahro</title>
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#38bdf8">
+    <meta name="theme-color" content="#2ecc71">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://github.com/masrahmat-id/absensi/raw/main/icon-absensi-azzahro%20(1).png">
@@ -14,27 +14,25 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         :root {
-            /* Tema Dark (Midnight Royal) */
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --primary: #38bdf8;
-            --success: #22c55e;
-            --border-color: #334155;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --primary: #2ecc71; 
+            --success: #27ae60;
+            --border-color: #333;
         }
 
         [data-theme="light"] {
-            /* Tema Light (Midnight Royal) */
-            --bg-color: #f1f5f9;
+            --bg-color: #f5f6fa;
             --card-bg: #ffffff;
-            --text-color: #1e293b;
-            --primary: #0284c7;
-            --success: #16a34a;
-            --border-color: #e2e8f0;
+            --text-color: #2f3640;
+            --primary: #27ae60;
+            --success: #2ecc71;
+            --border-color: #dcdde1;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             text-align: center;
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -49,22 +47,19 @@
             align-items: center;
             justify-content: center;
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .header-container img {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             object-fit: contain;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
         .header-container h3 {
             margin: 0;
-            font-size: 0.95rem;
-            line-height: 1.3;
-            letter-spacing: 0.5px;
-            font-weight: 700;
+            font-size: 1rem;
+            line-height: 1.2;
         }
 
         .controls-row {
@@ -86,7 +81,6 @@
             border-radius: 12px;
             font-size: 16px;
             outline: none;
-            cursor: pointer;
         }
 
         .btn-settings {
@@ -101,12 +95,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .btn-settings:active {
-            transform: scale(0.9);
-            background: var(--border-color);
         }
 
         .scanner-box {
@@ -115,15 +103,14 @@
             margin: 0 auto;
             background: var(--card-bg);
             padding: 10px;
-            border-radius: 24px;
+            border-radius: 20px;
             border: 1px solid var(--border-color);
             position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
         #reader { 
             width: 100%; 
-            border-radius: 18px; 
+            border-radius: 15px; 
             overflow: hidden; 
             background: black; 
         }
@@ -135,7 +122,7 @@
             position: absolute;
             left: 10%;
             z-index: 10;
-            box-shadow: 0 0 15px var(--primary);
+            box-shadow: 0 0 12px var(--primary);
             animation: scanAnim 2.5s infinite ease-in-out;
             pointer-events: none;
             display: none;
@@ -151,7 +138,8 @@
             display: block;
         }
 
-        /* Status Toast */
+        #reader__dashboard, #reader__camera_selection { display: none !important; }
+
         #status-kirim {
             position: fixed;
             top: 20px;
@@ -159,18 +147,17 @@
             transform: translateX(-50%);
             width: 85%;
             max-width: 400px;
-            padding: 16px;
-            border-radius: 14px;
+            padding: 15px;
+            border-radius: 12px;
             font-weight: bold;
             z-index: 9999;
             display: none;
             background-color: var(--success);
             color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid white;
+            transition: opacity 0.5s ease;
         }
 
-        /* Modal Pengaturan */
         #settings-modal {
             display: none;
             position: fixed;
@@ -178,55 +165,60 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: var(--card-bg);
-            padding: 25px;
-            border-radius: 20px;
+            padding: 20px;
+            border-radius: 15px;
             border: 2px solid var(--primary);
             z-index: 1002;
             width: 85%;
             max-width: 320px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
 
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1001;
-            backdrop-filter: blur(4px);
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
         }
 
         .btn-save {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             background: var(--primary);
             color: white;
             font-weight: bold;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             margin-top: 20px;
             cursor: pointer;
-            letter-spacing: 1px;
         }
 
         .creator-info {
-            margin-top: 20px;
+            margin-top: 15px;
             font-size: 10px;
-            color: gray;
-            opacity: 0.7;
+            color: rgba(128, 128, 128, 0.5);
+            letter-spacing: 0.5px;
+        }
+
+        /* Input color styling */
+        input[type="color"] {
+            border: none;
+            width: 40px;
+            height: 30px;
+            cursor: pointer;
+            background: none;
         }
     </style>
 </head>
 <body data-theme="dark">
 
     <div id="status-kirim"></div>
-    <div class="modal-overlay" id="overlay" onclick="toggleSettings()"></div>
 
     <div id="settings-modal">
-        <h3 style="margin:0 0 20px 0; color: var(--primary);">Pengaturan</h3>
+        <h4 style="margin:0 0 15px 0">Pengaturan</h4>
         
-        <label style="font-size: 13px; color: gray; display:block; text-align:left; margin-bottom: 8px;">Suara Notifikasi:</label>
-        <select id="sound-choice" style="width:100%; margin-bottom:20px;">
+        <label style="font-size: 12px; color: gray; display:block; text-align:left;">Suara Notifikasi:</label>
+        <select id="sound-choice" style="width:100%; border-color:var(--primary); margin-bottom:15px;">
             <option value="Notif01.mp3">Notif 01</option>
             <option value="Notif02.mp3">Notif 02</option>
             <option value="Notif03.mp3">Notif 03</option>
@@ -236,13 +228,18 @@
             <option value="Yayyy.mp3">Yayyy!</option>
         </select>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-            <span style="font-size: 15px;">Mode Terang</span>
-            <input type="checkbox" id="theme-toggle" onchange="previewTheme()" style="width:20px; height:20px;">
+        <div class="setting-item">
+            <span style="font-size: 15px;">Warna Tema</span>
+            <input type="color" id="color-picker" onchange="previewColor()">
         </div>
 
-        <button class="btn-save" onclick="saveSettings()">SIMPAN PERUBAHAN</button>
-        <div class="creator-info">Ops: Rahmattullah</div>
+        <div class="setting-item">
+            <span style="font-size: 15px;">Mode Terang</span>
+            <input type="checkbox" id="theme-toggle" onchange="previewTheme()" style="width:18px; height:18px;">
+        </div>
+
+        <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
+        <div class="creator-info">Created by ops: Rahmattullah</div>
     </div>
 
     <div class="header-container">
@@ -258,7 +255,7 @@
             <option value="S">🔵 SAKIT</option>
             <option value="A">🔴 ALPA</option>
         </select>
-        <div class="btn-settings" onclick="toggleSettings()">⚙</div>
+        <div class="btn-settings" onclick="toggleSettings()">☰</div>
     </div>
 
     <div class="scanner-box">
@@ -267,10 +264,14 @@
     </div>
 
     <script>
-        // PWA Service Worker
+        // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Fail', err));
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('SW Registered!', reg);
+                }).catch(err => {
+                    console.log('SW Registration Failed', err);
+                });
             });
         }
 
@@ -278,20 +279,27 @@
         const rawURL = 'https://github.com/masrahmat-id/absensi/raw/main/';
         let isProcessing = false;
 
+        // Load Settings
         let currentSoundFile = localStorage.getItem('selectedSound') || 'Notif01.mp3';
         let currentTheme = localStorage.getItem('selectedTheme') || 'dark';
+        let currentPrimaryColor = localStorage.getItem('selectedColor') || '#2ecc71';
         
-        // Load Theme & Settings
+        // Apply saved settings
         document.body.setAttribute('data-theme', currentTheme);
+        document.documentElement.style.setProperty('--primary', currentPrimaryColor);
         document.getElementById('sound-choice').value = currentSoundFile;
         document.getElementById('theme-toggle').checked = (currentTheme === 'light');
+        document.getElementById('color-picker').value = currentPrimaryColor;
 
         function toggleSettings() {
             const modal = document.getElementById('settings-modal');
-            const overlay = document.getElementById('overlay');
-            const isOpen = modal.style.display === 'block';
-            modal.style.display = isOpen ? 'none' : 'block';
-            overlay.style.display = isOpen ? 'none' : 'block';
+            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Preview Warna Kustom
+        function previewColor() {
+            const newColor = document.getElementById('color-picker').value;
+            document.documentElement.style.setProperty('--primary', newColor);
         }
 
         function previewTheme() {
@@ -302,21 +310,18 @@
         function saveSettings() {
             currentSoundFile = document.getElementById('sound-choice').value;
             currentTheme = document.getElementById('theme-toggle').checked ? 'light' : 'dark';
+            currentPrimaryColor = document.getElementById('color-picker').value;
+
             localStorage.setItem('selectedSound', currentSoundFile);
             localStorage.setItem('selectedTheme', currentTheme);
+            localStorage.setItem('selectedColor', currentPrimaryColor);
             
-            // Tes suara
-            const audio = new Audio(rawURL + currentSoundFile);
-            audio.play();
-            
+            new Audio(rawURL + currentSoundFile).play();
             toggleSettings();
         }
 
-        // Inisialisasi Scanner
         const html5QrCode = new Html5Qrcode("reader");
-        const config = { fps: 20, qrbox: { width: 250, height: 250 } };
-
-        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
+        html5QrCode.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, onScanSuccess);
 
         function onScanSuccess(decodedText) {
             if (isProcessing) return; 
@@ -325,17 +330,14 @@
             const statusDiv = document.getElementById('status-kirim');
             const ket = document.getElementById('keterangan').value;
 
-            // Feedback Suara & Getar
             new Audio(rawURL + currentSoundFile).play().catch(() => {});
             if (navigator.vibrate) navigator.vibrate(100);
 
-            // Kirim ke Google Sheets
             fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ket)}`, {
                 method: 'GET', mode: 'no-cors'
             });
 
-            // Tampilkan Notifikasi Sukses
-            statusDiv.innerText = "✔ BERHASIL: " + decodedText;
+            statusDiv.innerText = "✔ TERKIRIM: " + decodedText;
             statusDiv.style.display = "block";
             statusDiv.style.opacity = "1";
 
@@ -345,7 +347,7 @@
                     statusDiv.style.display = "none";
                     isProcessing = false;
                 }, 500); 
-            }, 2500); 
+            }, 2000); 
         }
     </script>
 </body>
