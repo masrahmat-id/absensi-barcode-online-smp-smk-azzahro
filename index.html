@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Digital - Az-Zahro</title>
+    <title>Absensi Az-Zahro</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
@@ -55,14 +55,14 @@
             line-height: 1.2;
         }
 
-        /* Baris Kehadiran & Pengaturan */
+        /* Baris Kontrol */
         .controls-row {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             max-width: 420px;
-            margin: 0 auto 20px auto;
+            margin: 0 auto 15px auto;
         }
 
         select {
@@ -89,15 +89,55 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
         }
 
-        .btn-settings:active {
-            border-color: var(--primary);
+        /* Scanner Box & Animasi */
+        .scanner-box {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: black; }
+        #reader__dashboard, #reader__camera_selection { display: none !important; }
+
+        .scan-line {
+            width: 100%;
+            height: 3px;
+            background-color: var(--success);
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            box-shadow: 0 0 10px var(--success);
+            animation: scanAnim 2s infinite linear;
+        }
+
+        @keyframes scanAnim {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        /* Statistik Counter */
+        #counter-absen {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
             color: var(--primary);
+            background: var(--card-bg);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
         }
 
-        /* Modal */
+        /* Modal Pengaturan */
         #settings-modal {
             display: none;
             position: fixed;
@@ -114,6 +154,19 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
 
+        .btn-save {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        /* Notifikasi Sukses */
         #status-kirim {
             position: fixed;
             top: 20px;
@@ -131,43 +184,6 @@
             border: 1px solid white;
             transition: opacity 0.5s ease;
         }
-
-        .scanner-box {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            padding: 10px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-        }
-
-        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: black; }
-        #reader__dashboard, #reader__camera_selection { display: none !important; }
-
-        .btn-save {
-            width: 100%;
-            padding: 12px;
-            background: var(--primary);
-            color: white;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-
-        .setting-item {
-            margin-top: 15px;
-            text-align: left;
-        }
-
-        .setting-item label {
-            font-size: 12px;
-            color: gray;
-            display: block;
-            margin-bottom: 5px;
-        }
     </style>
 </head>
 <body data-theme="dark">
@@ -176,10 +192,9 @@
 
     <div id="settings-modal">
         <h4 style="margin:0 0 15px 0">Pengaturan</h4>
-        
-        <div class="setting-item">
-            <label>Suara Notifikasi:</label>
-            <select id="sound-choice" style="width:100%; border-color:var(--primary);">
+        <div style="text-align:left;">
+            <label style="font-size:12px; color:gray;">Suara Notifikasi:</label>
+            <select id="sound-choice" style="width:100%; margin-bottom:15px; border-color:var(--primary);">
                 <option value="Done.mp3">Done</option>
                 <option value="Mission-success.mp3">Mission Success</option>
                 <option value="Notif01.mp3">Notif 01</option>
@@ -188,13 +203,14 @@
                 <option value="Success-fanfare-trumpets.mp3">Success Fanfare</option>
                 <option value="Yayyy.mp3">Yayyy!</option>
             </select>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size: 15px;">Mode Terang</span>
+                <input type="checkbox" id="theme-toggle" onchange="previewTheme()" style="width:20px; height:20px;">
+            </div>
+            
+            <button style="background:#e74c3c; color:white; border:none; padding:8px; width:100%; border-radius:5px; margin-top:15px; cursor:pointer;" onclick="resetCounter()">Reset Hitungan Harian</button>
         </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding: 0 5px;">
-            <span style="font-size: 15px;">Mode Terang</span>
-            <input type="checkbox" id="theme-toggle" onchange="previewTheme()" style="width:20px; height:20px;">
-        </div>
-
         <button class="btn-save" onclick="saveSettings()">SIMPAN & TUTUP</button>
     </div>
 
@@ -216,19 +232,25 @@
 
     <div class="scanner-box">
         <div id="reader"></div>
+        <div class="scan-line"></div>
     </div>
+
+    <div id="counter-absen">Siswa ter-scan hari ini: <span id="jml-scan">0</span></div>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwCXbDTuaFkN7GlcXJxaFgDaKPEp2G9vySF1IKfWxUCTuEOCYt39nMmlEmI25pz4PSd/exec';
         const rawURL = 'https://github.com/masrahmat-id/absensi/raw/main/';
         let isProcessing = false;
 
+        // Inisialisasi Pengaturan & Counter
         let currentSoundFile = localStorage.getItem('selectedSound') || 'Notif01.mp3';
         let currentTheme = localStorage.getItem('selectedTheme') || 'dark';
-        
+        let totalScan = parseInt(localStorage.getItem('totalScanDay')) || 0;
+
         document.body.setAttribute('data-theme', currentTheme);
         document.getElementById('sound-choice').value = currentSoundFile;
         document.getElementById('theme-toggle').checked = (currentTheme === 'light');
+        document.getElementById('jml-scan').innerText = totalScan;
 
         function toggleSettings() {
             const modal = document.getElementById('settings-modal');
@@ -249,6 +271,14 @@
             toggleSettings();
         }
 
+        function resetCounter() {
+            if(confirm("Reset jumlah hitungan harian?")) {
+                totalScan = 0;
+                document.getElementById('jml-scan').innerText = "0";
+                localStorage.setItem('totalScanDay', 0);
+            }
+        }
+
         const html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, onScanSuccess);
 
@@ -259,13 +289,21 @@
             const statusDiv = document.getElementById('status-kirim');
             const ket = document.getElementById('keterangan').value;
 
+            // Audio & Getar
             new Audio(rawURL + currentSoundFile).play().catch(() => {});
             if (navigator.vibrate) navigator.vibrate(100);
 
+            // Update Counter
+            totalScan++;
+            document.getElementById('jml-scan').innerText = totalScan;
+            localStorage.setItem('totalScanDay', totalScan);
+
+            // Kirim Data
             fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ket)}`, {
                 method: 'GET', mode: 'no-cors'
             });
 
+            // Notifikasi
             statusDiv.innerText = "✔ TERKIRIM: " + decodedText;
             statusDiv.style.display = "block";
             statusDiv.style.opacity = "1";
