@@ -89,7 +89,6 @@
             justify-content: center;
         }
 
-        /* --- BAGIAN SCANNER OVERLAY --- */
         .scanner-box {
             width: 100%;
             max-width: 400px;
@@ -108,9 +107,8 @@
             background: black; 
         }
 
-        /* Styling Garis Scan Khusus di dalam QR Box */
         .scan-line {
-            width: 250px; /* Sesuai qrbox */
+            width: 250px; 
             height: 3px;
             background-color: var(--success);
             position: absolute;
@@ -120,17 +118,15 @@
             box-shadow: 0 0 12px var(--success);
             animation: scanAnim 2.5s infinite ease-in-out;
             pointer-events: none;
-            display: none; /* Akan muncul otomatis saat kamera aktif */
+            display: none;
         }
 
-        /* Koordinat Gerak Garis (disesuaikan agar pas di tengah siku-siku) */
         @keyframes scanAnim {
             0% { top: calc(50% - 125px); }
             50% { top: calc(50% + 125px); }
             100% { top: calc(50% - 125px); }
         }
 
-        /* Tampilkan garis ketika scanner-box memiliki konten */
         #reader:not(:empty) + .scan-line {
             display: block;
         }
@@ -182,6 +178,14 @@
             margin-top: 20px;
             cursor: pointer;
         }
+
+        /* Styling Nama Pembuat */
+        .creator-info {
+            margin-top: 15px;
+            font-size: 10px;
+            color: rgba(128, 128, 128, 0.5); /* Warna samar */
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body data-theme="dark">
@@ -205,6 +209,8 @@
             <input type="checkbox" id="theme-toggle" onchange="previewTheme()" style="width:18px; height:18px;">
         </div>
         <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
+        
+        <div class="creator-info">Created by ops: Rahmattullah</div>
     </div>
 
     <div class="header-container">
