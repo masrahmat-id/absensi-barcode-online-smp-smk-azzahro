@@ -15,21 +15,18 @@
         /* Variabel Dasar */
         :root {
             --primary: #2ecc71;
-            /* Default Dark Mode */
             --bg-body: #121212;
             --bg-card: #1e1e1e;
             --text-main: #ffffff;
-            --text-sub: #aaaaaa;
-            --border-ui: rgba(255,255,255,0.1);
+            --header-font-size: 0.9rem;
+            --logo-size: 65px;
+            --header-text-color: #2ecc71;
         }
 
-        /* Variabel Light Mode */
         [data-theme="light"] {
             --bg-body: #f0f2f5;
             --bg-card: #ffffff;
             --text-main: #1a1a1a;
-            --text-sub: #666666;
-            --border-ui: rgba(0,0,0,0.1);
         }
 
         html, body {
@@ -68,17 +65,17 @@
         }
 
         .header-container img {
-            width: 65px;
-            height: 65px;
+            width: var(--logo-size);
+            height: var(--logo-size);
             object-fit: contain;
             filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
         }
 
         .header-container h3 {
             margin: 0;
-            font-size: 0.9rem;
-            line-height: 1.0;
-            color: var(--primary);
+            font-size: var(--header-font-size);
+            line-height: 1.1;
+            color: var(--header-text-color);
             font-weight: 800;
         }
 
@@ -96,10 +93,9 @@
             border-radius: 15px;
             height: 55px;
             font-size: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        select { flex-grow: 1; padding: 0 15px; font-weight: bold; cursor: pointer; }
+        select { flex-grow: 1; padding: 0 15px; font-weight: bold; }
         .btn-settings { width: 55px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; }
 
         /* Scanner Area */
@@ -111,21 +107,9 @@
             border: 4px solid var(--primary);
             position: relative;
             box-sizing: border-box;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
         }
 
         #reader { width: 100%; border-radius: 18px; overflow: hidden; background: #000; }
-
-        .scan-line {
-            width: 80%; height: 3px; background-color: var(--primary);
-            position: absolute; left: 10%; z-index: 10;
-            box-shadow: 0 0 15px var(--primary);
-            animation: scanAnim 3s infinite ease-in-out;
-            display: none;
-        }
-
-        @keyframes scanAnim { 0%, 100% { top: 25%; } 50% { top: 75%; } }
-        #reader:not(:empty) + .scan-line { display: block; }
 
         /* Settings Modal */
         #settings-modal {
@@ -133,37 +117,35 @@
             position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%); 
             background: var(--bg-card);
-            padding: 25px; border-radius: 20px; 
+            padding: 20px; border-radius: 20px; 
             border: 3px solid var(--primary);
-            z-index: 10000; width: 85%; max-width: 320px;
+            z-index: 10000; width: 90%; max-width: 350px;
+            max-height: 80vh; overflow-y: auto;
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
         .setting-item { 
             display: flex; justify-content: space-between; 
-            align-items: center; margin-top: 20px;
-            font-weight: 500;
+            align-items: center; margin-top: 15px;
+            font-size: 14px;
         }
+
+        .setting-item input[type="range"] { width: 100px; }
 
         .btn-save { 
             width: 100%; padding: 15px; 
             background: var(--primary); 
             color: white; font-weight: bold; 
             border: none; border-radius: 12px; 
-            margin-top: 25px; cursor: pointer;
-            font-size: 16px;
+            margin-top: 20px; cursor: pointer;
         }
 
-        /* Status Toast */
         #status-kirim {
             position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
             width: 80%; padding: 15px; border-radius: 15px;
             z-index: 10001; display: none; background-color: var(--primary);
             color: white; border: 2px solid white; text-align: center; font-weight: bold;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
-
-        input[type="checkbox"] { transform: scale(1.5); accent-color: var(--primary); }
     </style>
 </head>
 <body data-theme="dark">
@@ -172,36 +154,53 @@
 
     <div class="main-app">
         <div class="header-container">
-            <img src="logo-smp-azzahro.png" alt="SMP">
-            <h3>ABSENSI DIGITAL<br>SMP ISLAM AZ-ZAHRO<br>SMK AZ-ZAHRO</h3>
-            <img src="logo-smk-azzahro.png" alt="SMK">
+            <img src="logo-smp-azzahro.png" alt="SMP" id="img-logo1">
+            <h3 id="text-header">ABSENSI DIGITAL<br>SMP ISLAM AZ-ZAHRO<br>SMK AZ-ZAHRO</h3>
+            <img src="logo-smk-azzahro.png" alt="SMK" id="img-logo2">
         </div>
 
         <div id="settings-modal">
-            <h3 style="margin-top:0; color:var(--primary)">Pengaturan</h3>
+            <h3 style="margin-top:0; color:var(--primary); text-align: center;">Pengaturan</h3>
             
-            <label style="font-size: 12px; opacity: 0.6; display:block; text-align:left;">Pilih Suara:</label>
-            <select id="sound-choice" style="width:100%; height: 45px; margin-bottom:15px; border-radius: 8px;">
+            <label style="font-size: 11px; opacity: 0.6;">SUARA NOTIFIKASI:</label>
+            <select id="sound-choice" style="width:100%; height: 40px; margin-bottom:10px;">
                 <option value="Notif01.mp3">Notif 01</option>
                 <option value="Notif02.mp3">Notif 02</option>
-                <option value="Notif03.mp3">Notif 03</option>
                 <option value="Done.mp3">Done</option>
-                <option value="Mission-success.mp3">Mission Success</option>
-                <option value="Success-fanfare-trumpets.mp3">Success Fanfare</option>
                 <option value="Yayyy.mp3">Yayyy...!!</option>
             </select>
 
             <div class="setting-item">
-                <span>Warna Tema</span>
-                <input type="color" id="color-picker" oninput="previewColor()" style="width:45px; height:35px; border:none; background:none;">
+                <span>Ukuran Logo</span>
+                <input type="range" id="range-logo" min="40" max="120" oninput="previewLayout()">
+            </div>
+
+            <div class="setting-item">
+                <span>Ukuran Tulisan</span>
+                <input type="range" id="range-font" min="0.5" max="1.5" step="0.1" oninput="previewLayout()">
+            </div>
+
+            <div class="setting-item">
+                <span>Warna Tulisan</span>
+                <input type="color" id="color-text" oninput="previewLayout()">
+            </div>
+
+            <div class="setting-item">
+                <span>Warna Latar</span>
+                <input type="color" id="color-bg" oninput="previewLayout()">
+            </div>
+
+            <div class="setting-item">
+                <span>Warna Tema (Garis)</span>
+                <input type="color" id="color-picker" oninput="previewLayout()">
             </div>
 
             <div class="setting-item">
                 <span>Mode Terang</span>
-                <input type="checkbox" id="theme-toggle" onchange="previewTheme()">
+                <input type="checkbox" id="theme-toggle" onchange="previewLayout()">
             </div>
 
-            <button class="btn-save" onclick="saveSettings()">SIMPAN & TUTUP</button>
+            <button class="btn-save" onclick="saveSettings()">SIMPAN PERMANEN</button>
         </div>
 
         <div class="controls-row">
@@ -216,12 +215,10 @@
 
         <div class="scanner-box">
             <div id="reader"></div>
-            <div class="scan-line"></div>
+            <div class="scan-line" style="width: 80%; height: 3px; background-color: var(--primary); position: absolute; left: 10%; z-index: 10; animation: scanAnim 3s infinite ease-in-out;"></div>
         </div>
         
-        <p style="font-size: 11px; opacity: 0.5; margin-top: 20px;">
-            Klik layar untuk Fullscreen (Tanpa Bar Sinyal)
-        </p>
+        <p style="font-size: 11px; opacity: 0.5; margin-top: 20px;">Sentuh layar untuk Fullscreen</p>
     </div>
 
     <script>
@@ -229,7 +226,7 @@
         const rawURL = 'https://github.com/masrahmat-id/absensi/raw/main/';
         let isProcessing = false;
 
-        // --- 1. LOGIKA FULLSCREEN ---
+        // --- 1. FULLSCREEN ---
         function activateFullscreen() {
             const el = document.documentElement;
             if (el.requestFullscreen) el.requestFullscreen();
@@ -237,75 +234,90 @@
         }
         document.addEventListener("click", () => activateFullscreen(), { once: true });
 
-        // --- 2. LOGIKA TEMA (DARK/LIGHT) ---
-        let currentSound = localStorage.getItem('selectedSound') || 'Notif01.mp3';
-        let currentTheme = localStorage.getItem('selectedTheme') || 'dark';
-        let currentColor = localStorage.getItem('selectedColor') || '#2ecc71';
+        // --- 2. LOGIKA SETTINGS ---
+        function applySettings() {
+            const config = JSON.parse(localStorage.getItem('absensiConfig')) || {
+                sound: 'Notif01.mp3',
+                theme: 'dark',
+                primary: '#2ecc71',
+                logoSize: '65',
+                fontSize: '0.9',
+                textColor: '#2ecc71',
+                bgColor: '#121212'
+            };
 
-        // Terapkan saat aplikasi dibuka
-        function applySavedSettings() {
-            document.body.setAttribute('data-theme', currentTheme);
-            document.documentElement.style.setProperty('--primary', currentColor);
-            document.getElementById('sound-choice').value = currentSound;
-            document.getElementById('color-picker').value = currentColor;
-            document.getElementById('theme-toggle').checked = (currentTheme === 'light');
+            document.body.setAttribute('data-theme', config.theme);
+            document.documentElement.style.setProperty('--primary', config.primary);
+            document.documentElement.style.setProperty('--logo-size', config.logoSize + 'px');
+            document.documentElement.style.setProperty('--header-font-size', config.fontSize + 'rem');
+            document.documentElement.style.setProperty('--header-text-color', config.textColor);
+            document.documentElement.style.setProperty('--bg-body', config.bgColor);
+
+            // Set Form Values
+            document.getElementById('sound-choice').value = config.sound;
+            document.getElementById('color-picker').value = config.primary;
+            document.getElementById('range-logo').value = config.logoSize;
+            document.getElementById('range-font').value = config.fontSize;
+            document.getElementById('color-text').value = config.textColor;
+            document.getElementById('color-bg').value = config.bgColor;
+            document.getElementById('theme-toggle').checked = (config.theme === 'light');
         }
-        applySavedSettings();
+
+        function previewLayout() {
+            const primary = document.getElementById('color-picker').value;
+            const logoSize = document.getElementById('range-logo').value;
+            const fontSize = document.getElementById('range-font').value;
+            const textColor = document.getElementById('color-text').value;
+            const bgColor = document.getElementById('color-bg').value;
+            const isLight = document.getElementById('theme-toggle').checked;
+
+            document.documentElement.style.setProperty('--primary', primary);
+            document.documentElement.style.setProperty('--logo-size', logoSize + 'px');
+            document.documentElement.style.setProperty('--header-font-size', fontSize + 'rem');
+            document.documentElement.style.setProperty('--header-text-color', textColor);
+            document.documentElement.style.setProperty('--bg-body', bgColor);
+            document.body.setAttribute('data-theme', isLight ? 'light' : 'dark');
+        }
+
+        function saveSettings() {
+            const config = {
+                sound: document.getElementById('sound-choice').value,
+                theme: document.getElementById('theme-toggle').checked ? 'light' : 'dark',
+                primary: document.getElementById('color-picker').value,
+                logoSize: document.getElementById('range-logo').value,
+                fontSize: document.getElementById('range-font').value,
+                textColor: document.getElementById('color-text').value,
+                bgColor: document.getElementById('color-bg').value
+            };
+            localStorage.setItem('absensiConfig', JSON.stringify(config));
+            new Audio(rawURL + config.sound).play().catch(() => {});
+            toggleSettings();
+        }
 
         function toggleSettings() {
             const m = document.getElementById('settings-modal');
             m.style.display = m.style.display === 'block' ? 'none' : 'block';
         }
 
-        // Preview langsung saat digeser/klik (Tanpa simpan dulu)
-        function previewColor() {
-            document.documentElement.style.setProperty('--primary', document.getElementById('color-picker').value);
-        }
-
-        function previewTheme() {
-            const isLight = document.getElementById('theme-toggle').checked;
-            document.body.setAttribute('data-theme', isLight ? 'light' : 'dark');
-        }
-
-        // Simpan permanen ke Memori HP
-        function saveSettings() {
-            currentSound = document.getElementById('sound-choice').value;
-            currentTheme = document.getElementById('theme-toggle').checked ? 'light' : 'dark';
-            currentColor = document.getElementById('color-picker').value;
-
-            localStorage.setItem('selectedSound', currentSound);
-            localStorage.setItem('selectedTheme', currentTheme);
-            localStorage.setItem('selectedColor', currentColor);
-            
-            // Tes suara saat simpan
-            new Audio(rawURL + currentSound).play().catch(() => {});
-            toggleSettings();
-        }
-
-        // --- 3. LOGIKA SCANNER ---
+        // --- 3. SCANNER ---
+        applySettings();
         const html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, (decodedText) => {
             if (isProcessing) return;
             isProcessing = true;
             
-            // Notifikasi Suara & Getar
-            new Audio(rawURL + currentSound).play().catch(() => {});
+            const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
+            new Audio(rawURL + config.sound).play().catch(() => {});
             if (navigator.vibrate) navigator.vibrate(100);
 
-            // Kirim ke Google Sheets
             fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(document.getElementById('keterangan').value)}`, { 
                 method: 'GET', mode: 'no-cors' 
             });
 
-            // Tampilkan Feedback
             const s = document.getElementById('status-kirim');
             s.innerText = "✔ BERHASIL: " + decodedText;
             s.style.display = "block";
-            
-            setTimeout(() => {
-                s.style.display = "none";
-                isProcessing = false;
-            }, 2000);
+            setTimeout(() => { s.style.display = "none"; isProcessing = false; }, 2000);
         });
     </script>
 </body>
