@@ -89,32 +89,17 @@
         #reader { width: 100%; height: 100%; }
         #reader video { object-fit: cover !important; min-height: 380px; }
 
-        /* MENGHILANGKAN GARIS BAWAAN HTML5-QRCODE SUPAYA TIDAK DOUBLE */
-        #reader__scan_region { border: none !important; }
-
         @keyframes scanAnim {
-            0% { top: 20%; opacity: 0.2; }
-            50% { top: 80%; opacity: 1; }
-            100% { top: 20%; opacity: 0.2; }
+            0% { top: 15%; opacity: 0.2; }
+            50% { top: 85%; opacity: 1; }
+            100% { top: 15%; opacity: 0.2; }
         }
         .scan-line {
-            width: 70%; height: 3px; background: var(--primary);
-            position: absolute; left: 15%; z-index: 15;
-            animation: scanAnim 3s infinite ease-in-out;
+            width: 80%; height: 2px; background: var(--primary);
+            position: absolute; left: 10%; z-index: 15;
+            animation: scanAnim 2.5s infinite ease-in-out;
             box-shadow: 0 0 15px var(--primary);
-            pointer-events: none;
         }
-
-        /* SIKU KAMERA TUNGGAL (Custom) */
-        .corner {
-            position: absolute; width: 35px; height: 35px;
-            border: 6px solid var(--primary); z-index: 20;
-            pointer-events: none;
-        }
-        .top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; border-radius: 10px 0 0 0; }
-        .top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; border-radius: 0 10px 0 0; }
-        .bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; border-radius: 0 0 0 10px; }
-        .bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; border-radius: 0 0 10px 0; }
 
         .last-scan-container { margin-top: 15px; width: 100%; }
 
@@ -174,10 +159,6 @@
         </div>
 
         <div class="scanner-box">
-            <div class="corner top-left"></div>
-            <div class="corner top-right"></div>
-            <div class="corner bottom-left"></div>
-            <div class="corner bottom-right"></div>
             <div class="scan-line"></div>
             <div id="reader"></div>
         </div>
@@ -280,8 +261,8 @@
         }
 
         function cancelSettings() { 
-            applySettings();
-            toggleSettings();
+            applySettings(); 
+            toggleSettings(); 
         }
 
         function saveSettings() {
@@ -300,16 +281,8 @@
         }
 
         applySettings();
-        
         const html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            { 
-                fps: 25, 
-                // qrbox dibuat sedikit lebih kecil agar siku custom membungkusnya dengan indah
-                qrbox: { width: 250, height: 250 },
-                aspectRatio: 0.8
-            }, 
+        html5QrCode.start({ facingMode: "environment" }, { fps: 25, qrbox: { width: 280, height: 280 }, aspectRatio: 0.8 }, 
             (decodedText) => {
                 if (isProcessing) return;
                 isProcessing = true;
