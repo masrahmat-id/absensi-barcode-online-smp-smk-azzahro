@@ -53,7 +53,7 @@
         .header-container {
             display: flex; align-items: center; justify-content: center;
             gap: 15px; margin-bottom: 10px;
-            margin-top: 30px; /* MENAMBAHKAN JARAK AGAR GESER KE BAWAH */
+            margin-top: 40px; /* GESER KE BAWAH */
         }
 
         .header-container img {
@@ -123,13 +123,15 @@
             font-size: 20px; box-sizing: border-box; outline: none;
         }
 
-        #settings-modal {
+        #settings-modal, #about-pop-up {
             display: none; position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%); background: var(--bg-card);
             padding: 25px; border-radius: 20px; border: 3px solid var(--primary);
-            z-index: 10000; width: 90%; max-width: 350px;
-            max-height: 85vh; overflow-y: auto; box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            z-index: 10000; width: 85%; max-width: 320px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
+
+        #about-pop-up { z-index: 10002; text-align: center; }
 
         .modal-header {
             display: flex; justify-content: space-between; align-items: center;
@@ -140,14 +142,10 @@
         .setting-item { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
         .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; font-weight: bold; border: none; border-radius: 12px; margin-top: 25px; cursor: pointer; }
 
-        /* Gaya Tentang Aplikasi */
-        .about-section {
-            margin-top: 20px; padding: 12px; background: rgba(0,0,0,0.2);
-            border-radius: 12px; border: 1px dashed var(--primary); cursor: pointer;
-        }
-        .about-content {
-            display: none; text-align: left; font-size: 12px; margin-top: 10px;
-            line-height: 1.5; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;
+        .btn-about-trigger {
+            margin-top: 20px; padding: 10px; border: 1px solid var(--primary);
+            border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: bold;
+            color: var(--primary); background: rgba(46, 204, 113, 0.1);
         }
 
         #status-kirim {
@@ -156,11 +154,17 @@
             z-index: 10001; display: none; background-color: var(--primary);
             color: white; border: 2px solid white; text-align: center; font-weight: bold;
         }
+        
+        .overlay-about {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 10001;
+        }
     </style>
 </head>
 <body data-theme="dark">
 
     <div id="status-kirim"></div>
+    <div id="about-overlay" class="overlay-about" onclick="closeAbout()"></div>
 
     <div class="main-app">
         <div class="header-container">
@@ -186,7 +190,6 @@
             <div class="corner top-right"></div>
             <div class="corner bottom-left"></div>
             <div class="corner bottom-right"></div>
-            
             <div class="scan-line"></div>
             <div id="reader"></div>
         </div>
@@ -195,9 +198,7 @@
             <input type="text" id="last-name-display" placeholder="MENUNGGU SCAN..." readonly>
         </div>
         
-        <p id="fullscreen-info" style="font-size: 11px; opacity: 0.5; margin-top: 15px;">
-            Ketuk layar untuk Fullscreen
-        </p>
+        <p id="fullscreen-info" style="font-size: 11px; opacity: 0.5; margin-top: 15px;">Ketuk layar untuk Fullscreen</p>
 
         <div id="settings-modal">
             <div class="modal-header">
@@ -223,21 +224,22 @@
             <div class="setting-item"><span>Warna Garis Tema</span><input type="color" id="color-picker" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Mode Terang</span><input type="checkbox" id="theme-toggle" onchange="previewLayout()"></div>
 
-            <div class="about-section" onclick="toggleAbout()">
-                <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; font-size:13px; color:var(--primary);">
-                    <span>ℹ️ Tentang Aplikasi</span>
-                    <span id="about-arrow">▼</span>
-                </div>
-                <div id="about-details" class="about-content">
-                    <p><strong>Aplikasi Absensi QR v2.0</strong></p>
-                    <p>Sistem pencatatan kehadiran digital SMP/SMK Az-Zahro.</p>
-                    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1);">
-                    <p>Pembuat: <strong>Rahmattullah</strong></p>
-                    <p>Email: <span style="color:var(--primary)">mas.rahmat.id@gmail.com</span></p>
-                </div>
-            </div>
+            <div class="btn-about-trigger" onclick="showAbout()">ℹ️ Tentang Aplikasi</div>
 
             <button class="btn-save" onclick="saveSettings()">SIMPAN SEMUA</button>
+        </div>
+
+        <div id="about-pop-up">
+            <h3 style="color:var(--primary); margin-top:0;">Tentang Aplikasi</h3>
+            <p style="font-size:13px; line-height:1.6;">
+                Aplikasi Absensi QR Digital v2.0<br>
+                Khusus SMP/SMK Az-Zahro
+            </p>
+            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; font-size:12px; text-align:left;">
+                <p><strong>Pembuat:</strong> Rahmattullah</p>
+                <p><strong>Email:</strong> mas.rahmat.id@gmail.com</p>
+            </div>
+            <button class="btn-save" style="margin-top:15px; padding:10px;" onclick="closeAbout()">TUTUP</button>
         </div>
     </div>
 
@@ -245,35 +247,23 @@
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwCXbDTuaFkN7GlcXJxaFgDaKPEp2G9vySF1IKfWxUCTuEOCYt39nMmlEmI25pz4PSd/exec';
         const rawURL = 'https://github.com/masrahmat-id/absensi/raw/main/';
         let isProcessing = false;
-        let wakeLock = null;
 
         function updateClock() {
             const now = new Date();
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            const timeString = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-            document.getElementById('clock-display').innerText = timeString.toUpperCase();
+            document.getElementById('clock-display').innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`.toUpperCase();
         }
         setInterval(updateClock, 1000); updateClock();
 
-        async function stayAwake() { 
-            try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {} 
+        function showAbout() {
+            document.getElementById('about-pop-up').style.display = 'block';
+            document.getElementById('about-overlay').style.display = 'block';
         }
 
-        function openFullscreen() {
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) elem.requestFullscreen();
-            document.getElementById('fullscreen-info').innerText = "Tampilan Terkunci (Fixed Mode)";
-            stayAwake();
-        }
-        document.body.addEventListener('click', openFullscreen, { once: true });
-
-        function toggleAbout() {
-            const details = document.getElementById('about-details');
-            const arrow = document.getElementById('about-arrow');
-            const isVisible = details.style.display === 'block';
-            details.style.display = isVisible ? 'none' : 'block';
-            arrow.innerText = isVisible ? '▼' : '▲';
+        function closeAbout() {
+            document.getElementById('about-pop-up').style.display = 'none';
+            document.getElementById('about-overlay').style.display = 'none';
         }
 
         function applySettings() {
@@ -310,10 +300,7 @@
             m.style.display = m.style.display === 'block' ? 'none' : 'block';
         }
 
-        function cancelSettings() { 
-            applySettings(); 
-            toggleSettings(); 
-        }
+        function cancelSettings() { applySettings(); toggleSettings(); }
 
         function saveSettings() {
             const config = {
@@ -332,11 +319,7 @@
 
         applySettings();
         const html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start({ facingMode: "environment" }, { 
-            fps: 25, 
-            qrbox: { width: 280, height: 280 }, 
-            aspectRatio: 0.75 
-        }, 
+        html5QrCode.start({ facingMode: "environment" }, { fps: 25, qrbox: { width: 280, height: 280 }, aspectRatio: 0.75 }, 
         (decodedText) => {
             if (isProcessing) return;
             isProcessing = true;
