@@ -6,25 +6,48 @@
     <title>Offline - Tic Tac Toe</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #fff; text-align: center; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        h1 { margin-bottom: 5px; font-size: 22px; color: #16a085; }
-        p { margin-bottom: 20px; opacity: 0.8; }
         
-        .board { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 10px; background: #16213e; padding: 10px; border-radius: 10px; }
-        .cell { background: #0f3460; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .cell:hover { background: #e94560; }
-        .cell.taken { cursor: not-allowed; }
+        .board { 
+            display: grid; 
+            grid-template-columns: repeat(3, 100px); 
+            grid-template-rows: repeat(3, 100px); 
+            gap: 10px; 
+            background: #16213e; 
+            padding: 10px; 
+            border-radius: 10px; 
+            position: relative; /* Penting untuk posisi garis */
+        }
+
+        .cell { 
+            background: #0f3460; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 40px; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
+
+        /* Garis Kemenangan */
+        #winning-line {
+            position: absolute;
+            background-color: #e94560;
+            display: none; /* Sembunyi secara default */
+            z-index: 10;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
 
         .status { margin-top: 20px; font-size: 18px; font-weight: bold; height: 25px; }
         .btn-action { margin-top: 15px; padding: 10px 20px; background: #e94560; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-retry { background: #16a085; margin-left: 10px; }
     </style>
 </head>
 <body>
 
     <h1>Koneksi Terputus</h1>
-    <p>Main X vs O dulu yuk sambil nunggu sinyal!</p>
-
     <div class="board" id="board">
+        <div id="winning-line"></div>
         <div class="cell" onclick="makeMove(0)"></div>
         <div class="cell" onclick="makeMove(1)"></div>
         <div class="cell" onclick="makeMove(2)"></div>
@@ -37,55 +60,50 @@
     </div>
 
     <div class="status" id="status">Giliran Kamu (X)</div>
-    
-    <div>
-        <button class="btn-action" onclick="resetGame()">Ulang Game</button>
-        <button class="btn-action btn-retry" onclick="window.location.reload()">Cek Koneksi</button>
-    </div>
+    <button class="btn-action" onclick="resetGame()">Main Lagi</button>
 
     <script>
         let board = ["", "", "", "", "", "", "", "", ""];
         let gameActive = true;
         const cells = document.querySelectorAll('.cell');
         const statusText = document.getElementById('status');
+        const winLine = document.getElementById('winning-line');
 
-        const winConditions = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Baris
-            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Kolom
-            [0, 4, 8], [2, 4, 6]             // Diagonal
+        // Koordinat garis [top, left, width, height, rotation]
+        const lineStyles = [
+            [45, 15, 290, 8, 0],   // Baris 1
+            [155, 15, 290, 8, 0],  // Baris 2
+            [265, 15, 290, 8, 0],  // Baris 3
+            [15, 45, 8, 290, 0],   // Kolom 1
+            [15, 155, 8, 290, 0],  // Kolom 2
+            [15, 265, 8, 290, 0],  // Kolom 3
+            [15, 15, 390, 8, 45],  // Diagonal \
+            [15, 305, 390, 8, 135] // Diagonal /
         ];
 
-        function makeMove(index) {
-            if (board[index] === "" && gameActive) {
-                board[index] = "X";
-                cells[index].innerText = "X";
-                cells[index].classList.add('taken');
-                checkWinner();
-                if (gameActive) {
-                    statusText.innerText = "Komputer berpikir...";
-                    setTimeout(computerMove, 500);
-                }
-            }
-        }
+        const winConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], 
+            [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]
+        ];
 
-        function computerMove() {
-            let emptyCells = board.map((val, idx) => val === "" ? idx : null).filter(val => val !== null);
-            if (emptyCells.length > 0 && gameActive) {
-                let randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                board[randomIndex] = "O";
-                cells[randomIndex].innerText = "O";
-                cells[randomIndex].classList.add('taken');
-                statusText.innerText = "Giliran Kamu (X)";
-                checkWinner();
-            }
+        function drawLine(index) {
+            const [top, left, w, h, deg] = lineStyles[index];
+            winLine.style.top = top + "px";
+            winLine.style.left = left + "px";
+            winLine.style.width = w + "px";
+            winLine.style.height = h + "px";
+            winLine.style.transform = `rotate(${deg}deg)`;
+            winLine.style.transformOrigin = "top left";
+            winLine.style.display = "block";
         }
 
         function checkWinner() {
-            for (let condition of winConditions) {
-                let [a, b, c] = condition;
+            for (let i = 0; i < winConditions.length; i++) {
+                let [a, b, c] = winConditions[i];
                 if (board[a] && board[a] === board[b] && board[a] === board[c]) {
                     statusText.innerText = board[a] === "X" ? "Kamu Menang! 🎉" : "Komputer Menang! 🤖";
                     gameActive = false;
+                    drawLine(i); // Gambar garis sejajar
                     return;
                 }
             }
@@ -95,14 +113,31 @@
             }
         }
 
+        function makeMove(index) {
+            if (board[index] === "" && gameActive) {
+                board[index] = "X";
+                cells[index].innerText = "X";
+                checkWinner();
+                if (gameActive) setTimeout(computerMove, 500);
+            }
+        }
+
+        function computerMove() {
+            let empty = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
+            if (empty.length > 0 && gameActive) {
+                let idx = empty[Math.floor(Math.random() * empty.length)];
+                board[idx] = "O";
+                cells[idx].innerText = "O";
+                checkWinner();
+            }
+        }
+
         function resetGame() {
             board = ["", "", "", "", "", "", "", "", ""];
             gameActive = true;
             statusText.innerText = "Giliran Kamu (X)";
-            cells.forEach(cell => {
-                cell.innerText = "";
-                cell.classList.remove('taken');
-            });
+            winLine.style.display = "none";
+            cells.forEach(c => c.innerText = "");
         }
     </script>
 </body>
