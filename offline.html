@@ -5,115 +5,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline Game - Tic Tac Toe Levels</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #fff; text-align: center; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        h1 { font-size: 22px; color: #38bdf8; margin: 0; }
+        /* Dasar & Reset */
+        * { box-sizing: border-box; }
         
-        .menu { margin-bottom: 20px; }
-        select { padding: 8px; border-radius: 5px; background: #1e293b; color: white; border: 1px solid #38bdf8; cursor: pointer; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0f172a;
+            font-family: 'Segoe UI', sans-serif;
+            color: #fff;
+        }
 
+        /* Container Utama */
+        #main-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer; /* Memberi petunjuk bahwa layar bisa diklik */
+        }
+
+        h1 { font-size: 24px; color: #38bdf8; margin: 0 0 10px 0; pointer-events: none; }
+        
+        .menu { margin-bottom: 20px; pointer-events: auto; }
+        select { 
+            padding: 8px; border-radius: 5px; background: #1e293b; 
+            color: white; border: 1px solid #38bdf8; cursor: pointer; 
+        }
+
+        /* Board Game */
         .board { 
-            display: grid; grid-template-columns: repeat(3, 85px); grid-template-rows: repeat(3, 85px); 
-            gap: 10px; background: #1e293b; padding: 15px; border-radius: 15px; position: relative;
+            display: grid; 
+            grid-template-columns: repeat(3, 85px); 
+            grid-template-rows: repeat(3, 85px); 
+            gap: 10px; 
+            background: #1e293b; 
+            padding: 15px; 
+            border-radius: 15px; 
+            position: relative;
+            pointer-events: auto; /* Agar klik di dalam board tetap berfungsi untuk game */
         }
 
         .cell { 
             background: #334155; border-radius: 10px; display: flex; align-items: center; 
             justify-content: center; font-size: 35px; font-weight: bold; cursor: pointer;
+            transition: background 0.2s;
         }
+        .cell:hover { background: #475569; }
         .cell.x-color { color: #38bdf8; }
         .cell.o-color { color: #fb7185; }
 
         #winning-line {
             position: absolute; background: #f43f5e; display: none; z-index: 10;
             border-radius: 10px; box-shadow: 0 0 15px #f43f5e;
+            pointer-events: none;
         }
 
-        .status { margin-top: 15px; font-size: 16px; color: #94a3b8; height: 20px; }
-        .btn-group { margin-top: 20px; display: flex; gap: 10px; }
+        .status { margin-top: 15px; font-size: 16px; color: #94a3b8; height: 20px; pointer-events: none; }
+        
+        .btn-group { margin-top: 20px; display: flex; gap: 10px; pointer-events: auto; }
         button { padding: 10px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .btn-reset { background: #334155; color: white; }
         .btn-online { background: #0ea5e9; color: white; }
-    </style>
-<style>
-    /* Menghilangkan margin bawaan dan scrollbar */
-    body, html {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden; /* Mencegah scroll muncul saat fullscreen */
-    }
 
-    /* Targetkan container utama Anda agar memenuhi layar */
-    #main-container {
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-</style>
-
-</head>
-<body>
-<div id="main-container">
-    <button onclick="toggleFullscreen()">Aktifkan Layar Penuh</button>
-</div>
-
-<script>
-    function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-            // Masuk ke mode Fullscreen
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
-                document.documentElement.webkitRequestFullscreen();
-            }
-        } else {
-            // Keluar dari mode Fullscreen
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            }
+        /* Instruksi kecil */
+        .hint {
+            position: absolute; bottom: 10px; font-size: 10px; color: #475569;
         }
-    }
+    </style>
+</head>
+<body onclick="requestFullscreen()">
 
-    // Opsional: Otomatis fullscreen saat user pertama kali klik di mana saja
-    // document.addEventListener("click", toggleFullscreen, { once: true });
-</script>
-    <h1>TIC TAC TOE</h1>
-    
-    <div class="menu">
-        <label>Level: </label>
-        <select id="difficulty" onchange="resetGame()">
-            <option value="easy"  selected>Mudah</option>
-            <option value="medium">Sedang</option>
-            <option value="hard">Sulit</option>
-            <option value="impossible">Mustahil 😂</option>
-        </select>
-    </div>
+    <div id="main-container">
+        <h1>TIC TAC TOE</h1>
+        
+        <div class="menu">
+            <label>Level: </label>
+            <select id="difficulty" onchange="resetGame()">
+                <option value="easy" selected>Mudah</option>
+                <option value="medium">Sedang</option>
+                <option value="hard">Sulit</option>
+                <option value="impossible">Mustahil 😂</option>
+            </select>
+        </div>
 
-    <div class="board" id="board">
-        <div id="winning-line"></div>
-        <div class="cell" onclick="makeMove(0)"></div>
-        <div class="cell" onclick="makeMove(1)"></div>
-        <div class="cell" onclick="makeMove(2)"></div>
-        <div class="cell" onclick="makeMove(3)"></div>
-        <div class="cell" onclick="makeMove(4)"></div>
-        <div class="cell" onclick="makeMove(5)"></div>
-        <div class="cell" onclick="makeMove(6)"></div>
-        <div class="cell" onclick="makeMove(7)"></div>
-        <div class="cell" onclick="makeMove(8)"></div>
-    </div>
+        <div class="board" id="board" onclick="event.stopPropagation()">
+            <div id="winning-line"></div>
+            <div class="cell" onclick="makeMove(0)"></div>
+            <div class="cell" onclick="makeMove(1)"></div>
+            <div class="cell" onclick="makeMove(2)"></div>
+            <div class="cell" onclick="makeMove(3)"></div>
+            <div class="cell" onclick="makeMove(4)"></div>
+            <div class="cell" onclick="makeMove(5)"></div>
+            <div class="cell" onclick="makeMove(6)"></div>
+            <div class="cell" onclick="makeMove(7)"></div>
+            <div class="cell" onclick="makeMove(8)"></div>
+        </div>
 
-    <div class="status" id="status">Giliran Kamu</div>
-    
-    <div class="btn-group">
-        <button class="btn-reset" onclick="resetGame()">Ulang</button>
-        <button class="btn-online" onclick="window.location.reload()">Cek Koneksi</button>
+        <div class="status" id="status">Giliran Kamu</div>
+        
+        <div class="btn-group" onclick="event.stopPropagation()">
+            <button class="btn-reset" onclick="resetGame()">Ulang</button>
+            <button class="btn-online" onclick="window.location.reload()">Cek Koneksi</button>
+        </div>
+
+        <div class="hint">Klik area kosong untuk layar penuh</div>
     </div>
 
     <script>
+        /* --- LOGIKA FULLSCREEN --- */
+        function requestFullscreen() {
+            let elem = document.documentElement;
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) { /* Safari */
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) { /* IE11 */
+                    elem.msRequestFullscreen();
+                }
+            }
+        }
+
+        /* --- LOGIKA GAME --- */
         let board = ["", "", "", "", "", "", "", "", ""];
         let huPlayer = "X";
         let aiPlayer = "O";
@@ -137,7 +156,6 @@
             let move;
             let rand = Math.random();
 
-            // Logika Tingkatan
             if (diff === "easy") {
                 move = randomMove();
             } else if (diff === "medium") {
