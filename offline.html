@@ -156,13 +156,13 @@
         </div>
 
         <div id="screen-mole" class="game-screen">
-            <h1>WHACK A MOLE</h1>
+            <h1>WHACK A CARROT</h1>
             <div class="menu-selection">
                 <label>Level: </label>
-                <select id="mole-level">
-                    <option value="1000">Mudah</option>
-                    <option value="700" selected>Sedang</option>
-                    <option value="400">Pro</option>
+                <select id="mole-level" onchange="initMole()">
+                    <option value="1200">Mudah</option>
+                    <option value="800" selected>Sedang</option>
+                    <option value="400">Sulit</option>
                 </select>
             </div>
             <canvas id="moleCanvas" width="300" height="300"></canvas>
@@ -298,12 +298,6 @@
             const ctx = canvas.getContext('2d');
             const box = 20;
             const speed = parseInt(document.getElementById('snake-level').value);
-            document.onkeydown = (e) => {
-                if(e.key === "ArrowUp") changeSnakeDir("UP");
-                if(e.key === "ArrowDown") changeSnakeDir("DOWN");
-                if(e.key === "ArrowLeft") changeSnakeDir("LEFT");
-                if(e.key === "ArrowRight") changeSnakeDir("RIGHT");
-            };
             snakeLoop = setInterval(() => {
                 ctx.fillStyle = "#1e293b"; ctx.fillRect(0,0,400,400);
                 for(let i=0; i<snake.length; i++) {
@@ -328,27 +322,16 @@
             }, speed);
         }
 
-        /* --- 3. LOGIKA MATH QUIZ (DENGAN NYAWA) --- */
+        /* --- 3. LOGIKA MATH QUIZ --- */
         let mathAns, mathScore = 0, mathLives = 5;
-
-        function resetMath() {
-            mathScore = 0;
-            mathLives = 5;
-            document.getElementById('math-status').innerText = "Skor: 0";
-            updateMathLives();
-            nextMath();
-        }
-
+        function resetMath() { mathScore = 0; mathLives = 5; updateMathLives(); nextMath(); }
         function updateMathLives() {
-            let hearts = "";
-            for(let i=0; i<mathLives; i++) hearts += "❤️";
+            let hearts = ""; for(let i=0; i<mathLives; i++) hearts += "❤️";
             document.getElementById('math-lives').innerText = hearts || "GAME OVER";
         }
-
         function nextMath() {
             const level = parseInt(document.getElementById('math-level').value);
-            const ops = ['+', '-', '*', '/'];
-            const op = ops[Math.floor(Math.random() * ops.length)];
+            const ops = ['+', '-', '*', '/']; const op = ops[Math.floor(Math.random() * ops.length)];
             let a, b;
             if (op === '+') { a = Math.floor(Math.random() * level); b = Math.floor(Math.random() * level); mathAns = a + b; }
             else if (op === '-') { a = Math.floor(Math.random() * level) + level; b = Math.floor(Math.random() * level); mathAns = a - b; }
@@ -357,57 +340,56 @@
             document.getElementById('math-q').innerText = `${a} ${op === '*' ? '×' : op === '/' ? '÷' : op} ${b}`;
             document.getElementById('math-ans').value = ""; document.getElementById('math-ans').focus();
         }
-
-        document.getElementById('math-ans').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                checkMathAnswer();
-            }
-        });
-
-        // Event listener 'oninput' hanya memproses jawaban otomatis jika benar
-        // Tapi untuk sistem nyawa, kita tambahkan logika tombol enter agar user tidak kaget
         document.getElementById('math-ans').oninput = function() {
             if(this.value.length >= mathAns.toString().length) {
-               if(parseInt(this.value) === mathAns) {
-                   mathScore++; 
-                   document.getElementById('math-status').innerText = "Skor: " + mathScore; 
-                   nextMath();
-               } else {
-                   // Jika jawaban salah dan panjang input sudah sama/lebih dengan jawaban asli
-                   mathLives--;
-                   updateMathLives();
-                   if(mathLives <= 0) {
-                       alert("Game Over! Skor Akhir: " + mathScore);
-                       resetMath();
-                   } else {
-                       nextMath();
-                   }
-               }
+               if(parseInt(this.value) === mathAns) { mathScore++; document.getElementById('math-status').innerText = "Skor: " + mathScore; nextMath(); } 
+               else { mathLives--; updateMathLives(); if(mathLives <= 0) { alert("Game Over! Skor: " + mathScore); resetMath(); } else nextMath(); }
             }
         };
 
-        /* --- 4. LOGIKA WHACK A MOLE --- */
+        /* --- 4. LOGIKA WHACK A MOLE (CARROT EDITION) --- */
         let moleIdx, moleScore, moleLoop;
         function initMole() {
-            clearInterval(moleLoop); moleScore = 0; document.getElementById('mole-status').innerText = "Skor: 0";
+            clearInterval(moleLoop); 
+            moleScore = 0; 
+            document.getElementById('mole-status').innerText = "Skor: 0";
             const canvas = document.getElementById('moleCanvas');
             const ctx = canvas.getContext('2d');
-            const speed = document.getElementById('mole-level').value;
+            
+            // Tingkat kesulitan berdasarkan kecepatan (ms)
+            const speed = parseInt(document.getElementById('mole-level').value);
+
             canvas.onclick = (e) => {
                 const rect = canvas.getBoundingClientRect();
                 const x = (e.clientX - rect.left) * (canvas.width / rect.width);
                 const y = (e.clientY - rect.top) * (canvas.height / rect.height);
                 const col = Math.floor(x/100); const row = Math.floor(y/100);
-                if(row*3 + col === moleIdx) { moleScore++; document.getElementById('mole-status').innerText = "Skor: " + moleScore; moleIdx = -1; drawMole(); }
+                if(row*3 + col === moleIdx) { 
+                    moleScore++; 
+                    document.getElementById('mole-status').innerText = "Skor: " + moleScore; 
+                    moleIdx = -1; 
+                    drawMole(); 
+                }
             };
+
             function drawMole() {
                 ctx.fillStyle = "#1e293b"; ctx.fillRect(0,0,300,300);
                 for(let i=0; i<9; i++) {
-                    ctx.strokeStyle = "#334155"; ctx.strokeRect((i%3)*100, Math.floor(i/3)*100, 100, 100);
-                    if(i === moleIdx) { ctx.font = "50px Arial"; ctx.fillText("🐭", (i%3)*100+25, Math.floor(i/3)*100+70); }
+                    ctx.strokeStyle = "#334155"; 
+                    ctx.strokeRect((i%3)*100, Math.floor(i/3)*100, 100, 100);
+                    if(i === moleIdx) { 
+                        ctx.font = "50px Arial"; 
+                        // Munculkan Wortel menggantikan Tikus
+                        ctx.fillText("🥕", (i%3)*100+25, Math.floor(i/3)*100+70); 
+                    }
                 }
             }
-            moleLoop = setInterval(() => { moleIdx = Math.floor(Math.random()*9); drawMole(); }, speed);
+            
+            // Interval berdasarkan dropdown level
+            moleLoop = setInterval(() => { 
+                moleIdx = Math.floor(Math.random()*9); 
+                drawMole(); 
+            }, speed);
         }
     </script>
 </body>
