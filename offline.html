@@ -1,93 +1,109 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline - Snake Game</title>
+    <title>Offline - Tic Tac Toe</title>
     <style>
-        body { background: #2c3e50; color: white; text-align: center; font-family: sans-serif; margin: 0; overflow: hidden; }
-        canvas { background: #34495e; display: block; margin: 10px auto; border: 5px solid #ecf0f1; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .score { font-size: 24px; margin: 10px; }
-        .controls { display: grid; grid-template-columns: repeat(3, 60px); gap: 10px; justify-content: center; margin-top: 10px; }
-        button { width: 60px; height: 60px; border-radius: 50%; border: none; background: #ecf0f1; font-weight: bold; font-size: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #fff; text-align: center; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        h1 { margin-bottom: 5px; font-size: 22px; color: #16a085; }
+        p { margin-bottom: 20px; opacity: 0.8; }
+        
+        .board { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 10px; background: #16213e; padding: 10px; border-radius: 10px; }
+        .cell { background: #0f3460; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .cell:hover { background: #e94560; }
+        .cell.taken { cursor: not-allowed; }
+
+        .status { margin-top: 20px; font-size: 18px; font-weight: bold; height: 25px; }
+        .btn-action { margin-top: 15px; padding: 10px 20px; background: #e94560; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-retry { background: #16a085; margin-left: 10px; }
     </style>
 </head>
 <body>
-    <div class="score">Skor: <span id="scoreVal">0</span></div>
-    <canvas id="snakeGame" width="300" height="300"></canvas>
-    
-    <div class="controls">
-        <div></div><button onclick="changeDir('UP')">↑</button><div></div>
-        <button onclick="changeDir('LEFT')">←</button><button onclick="changeDir('DOWN')">↓</button><button onclick="changeDir('RIGHT')">→</button>
+
+    <h1>Koneksi Terputus</h1>
+    <p>Main X vs O dulu yuk sambil nunggu sinyal!</p>
+
+    <div class="board" id="board">
+        <div class="cell" onclick="makeMove(0)"></div>
+        <div class="cell" onclick="makeMove(1)"></div>
+        <div class="cell" onclick="makeMove(2)"></div>
+        <div class="cell" onclick="makeMove(3)"></div>
+        <div class="cell" onclick="makeMove(4)"></div>
+        <div class="cell" onclick="makeMove(5)"></div>
+        <div class="cell" onclick="makeMove(6)"></div>
+        <div class="cell" onclick="makeMove(7)"></div>
+        <div class="cell" onclick="makeMove(8)"></div>
     </div>
-    <p>Gunakan tombol atau Swipe/Panah Keyboard</p>
-    <button onclick="window.location.reload()" style="width: auto; height: auto; border-radius: 5px; padding: 10px; margin-top: 10px;">Cek Koneksi</button>
+
+    <div class="status" id="status">Giliran Kamu (X)</div>
+    
+    <div>
+        <button class="btn-action" onclick="resetGame()">Ulang Game</button>
+        <button class="btn-action btn-retry" onclick="window.location.reload()">Cek Koneksi</button>
+    </div>
 
     <script>
-        const canvas = document.getElementById("snakeGame");
-        const ctx = canvas.getContext("2d");
-        const box = 20;
-        let score = 0;
-        let snake = [{x: 9 * box, y: 10 * box}];
-        let food = { x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box };
-        let d;
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let gameActive = true;
+        const cells = document.querySelectorAll('.cell');
+        const statusText = document.getElementById('status');
 
-        function changeDir(dir) {
-            if(dir == "LEFT" && d != "RIGHT") d = "LEFT";
-            if(dir == "UP" && d != "DOWN") d = "UP";
-            if(dir == "RIGHT" && d != "LEFT") d = "RIGHT";
-            if(dir == "DOWN" && d != "UP") d = "DOWN";
+        const winConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Baris
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Kolom
+            [0, 4, 8], [2, 4, 6]             // Diagonal
+        ];
+
+        function makeMove(index) {
+            if (board[index] === "" && gameActive) {
+                board[index] = "X";
+                cells[index].innerText = "X";
+                cells[index].classList.add('taken');
+                checkWinner();
+                if (gameActive) {
+                    statusText.innerText = "Komputer berpikir...";
+                    setTimeout(computerMove, 500);
+                }
+            }
         }
 
-        document.addEventListener("keydown", (e) => {
-            if(e.keyCode == 37 && d != "RIGHT") d = "LEFT";
-            else if(e.keyCode == 38 && d != "DOWN") d = "UP";
-            else if(e.keyCode == 39 && d != "LEFT") d = "RIGHT";
-            else if(e.keyCode == 40 && d != "UP") d = "DOWN";
-        });
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for(let i=0; i<snake.length; i++) {
-                ctx.fillStyle = (i == 0) ? "#2ecc71" : "#27ae60";
-                ctx.fillRect(snake[i].x, snake[i].y, box, box);
+        function computerMove() {
+            let emptyCells = board.map((val, idx) => val === "" ? idx : null).filter(val => val !== null);
+            if (emptyCells.length > 0 && gameActive) {
+                let randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                board[randomIndex] = "O";
+                cells[randomIndex].innerText = "O";
+                cells[randomIndex].classList.add('taken');
+                statusText.innerText = "Giliran Kamu (X)";
+                checkWinner();
             }
-            ctx.fillStyle = "#e74c3c";
-            ctx.fillRect(food.x, food.y, box, box);
-
-            let snakeX = snake[0].x;
-            let snakeY = snake[0].y;
-
-            if( d == "LEFT") snakeX -= box;
-            if( d == "UP") snakeY -= box;
-            if( d == "RIGHT") snakeX += box;
-            if( d == "DOWN") snakeY += box;
-
-            if(snakeX == food.x && snakeY == food.y) {
-                score++;
-                document.getElementById("scoreVal").innerHTML = score;
-                food = { x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box };
-            } else {
-                snake.pop();
-            }
-
-            let newHead = { x: snakeX, y: snakeY };
-
-            if(snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
-                clearInterval(game);
-                alert("Game Over! Skor: " + score);
-                location.reload();
-            }
-            snake.unshift(newHead);
         }
 
-        function collision(head, array) {
-            for(let i=0; i<array.length; i++) {
-                if(head.x == array[i].x && head.y == array[i].y) return true;
+        function checkWinner() {
+            for (let condition of winConditions) {
+                let [a, b, c] = condition;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    statusText.innerText = board[a] === "X" ? "Kamu Menang! 🎉" : "Komputer Menang! 🤖";
+                    gameActive = false;
+                    return;
+                }
             }
-            return false;
+            if (!board.includes("")) {
+                statusText.innerText = "Hasil Seri! 🤝";
+                gameActive = false;
+            }
         }
 
-        let game = setInterval(draw, 150);
+        function resetGame() {
+            board = ["", "", "", "", "", "", "", "", ""];
+            gameActive = true;
+            statusText.innerText = "Giliran Kamu (X)";
+            cells.forEach(cell => {
+                cell.innerText = "";
+                cell.classList.remove('taken');
+            });
+        }
     </script>
 </body>
 </html>
