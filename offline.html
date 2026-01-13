@@ -1,119 +1,93 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline - Main Dulu Yuk!</title>
+    <title>Offline - Snake Game</title>
     <style>
-        body { font-family: sans-serif; margin: 0; text-align: center; background: #f0f0f0; overflow: hidden; }
-        .info { padding: 20px; }
-        h1 { margin: 5px; color: #333; }
-        
-        /* Gaya Area Game */
-        #gameCanvas { 
-            background: #fff; 
-            border-bottom: 3px solid #333; 
-            display: block; 
-            margin: 0 auto;
-            max-width: 100%;
-        }
-        .instructions { color: #777; font-size: 14px; margin-top: 10px; }
-        .btn-retry { 
-            margin-top: 20px; padding: 10px 20px; 
-            background: #3498db; color: white; border: none; 
-            border-radius: 5px; cursor: pointer; 
-        }
+        body { background: #2c3e50; color: white; text-align: center; font-family: sans-serif; margin: 0; overflow: hidden; }
+        canvas { background: #34495e; display: block; margin: 10px auto; border: 5px solid #ecf0f1; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .score { font-size: 24px; margin: 10px; }
+        .controls { display: grid; grid-template-columns: repeat(3, 60px); gap: 10px; justify-content: center; margin-top: 10px; }
+        button { width: 60px; height: 60px; border-radius: 50%; border: none; background: #ecf0f1; font-weight: bold; font-size: 20px; }
     </style>
 </head>
 <body>
-
-    <div class="info">
-        <h1>Koneksi Terputus</h1>
-        <p>Sambil menunggu sinyal, main dulu yuk!</p>
+    <div class="score">Skor: <span id="scoreVal">0</span></div>
+    <canvas id="snakeGame" width="300" height="300"></canvas>
+    
+    <div class="controls">
+        <div></div><button onclick="changeDir('UP')">↑</button><div></div>
+        <button onclick="changeDir('LEFT')">←</button><button onclick="changeDir('DOWN')">↓</button><button onclick="changeDir('RIGHT')">→</button>
     </div>
-
-    <canvas id="gameCanvas" width="400" height="200"></canvas>
-    <p class="instructions">Ketuk layar atau tekan SPASI untuk lompat</p>
-
-    <button class="btn-retry" onclick="window.location.reload()">Cek Koneksi</button>
+    <p>Gunakan tombol atau Swipe/Panah Keyboard</p>
+    <button onclick="window.location.reload()" style="width: auto; height: auto; border-radius: 5px; padding: 10px; margin-top: 10px;">Cek Koneksi</button>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-
+        const canvas = document.getElementById("snakeGame");
+        const ctx = canvas.getContext("2d");
+        const box = 20;
         let score = 0;
-        let player = { x: 50, y: 150, w: 30, h: 30, dy: 0, jump: -8, grav: 0.5, grounded: false };
-        let obstacles = [];
-        let gameActive = true;
+        let snake = [{x: 9 * box, y: 10 * box}];
+        let food = { x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box };
+        let d;
 
-        function drawPlayer() {
-            ctx.fillStyle = '#3498db';
-            ctx.fillRect(player.x, player.y, player.w, player.h);
+        function changeDir(dir) {
+            if(dir == "LEFT" && d != "RIGHT") d = "LEFT";
+            if(dir == "UP" && d != "DOWN") d = "UP";
+            if(dir == "RIGHT" && d != "LEFT") d = "RIGHT";
+            if(dir == "DOWN" && d != "UP") d = "DOWN";
         }
 
-        function createObstacle() {
-            let size = 20 + Math.random() * 30;
-            obstacles.push({ x: 400, y: 200 - size, w: 20, h: size });
-        }
-
-        function update() {
-            if (!gameActive) return;
-
-            // Gravitasi
-            player.dy += player.grav;
-            player.y += player.dy;
-
-            if (player.y > 150) {
-                player.y = 150;
-                player.dy = 0;
-                player.grounded = true;
-            }
-
-            // Halangan
-            if (Math.random() < 0.02) createObstacle();
-
-            obstacles.forEach((obs, i) => {
-                obs.x -= 5;
-                if (obs.x + obs.w < 0) {
-                    obstacles.splice(i, 1);
-                    score++;
-                }
-
-                // Cek Tabrakan
-                if (player.x < obs.x + obs.w && player.x + player.w > obs.x &&
-                    player.y < obs.y + obs.h && player.y + player.h > obs.y) {
-                    gameActive = false;
-                    alert("Game Over! Skor Anda: " + score);
-                    location.reload();
-                }
-            });
-        }
+        document.addEventListener("keydown", (e) => {
+            if(e.keyCode == 37 && d != "RIGHT") d = "LEFT";
+            else if(e.keyCode == 38 && d != "DOWN") d = "UP";
+            else if(e.keyCode == 39 && d != "LEFT") d = "RIGHT";
+            else if(e.keyCode == 40 && d != "UP") d = "DOWN";
+        });
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawPlayer();
-            ctx.fillStyle = '#e74c3c';
-            obstacles.forEach(obs => ctx.fillRect(obs.x, obs.y, obs.w, obs.h));
-            
-            ctx.fillStyle = '#333';
-            ctx.fillText("Skor: " + score, 10, 20);
-            
-            update();
-            requestAnimationFrame(draw);
-        }
-
-        // Kontrol
-        function doJump() {
-            if (player.grounded) {
-                player.dy = player.jump;
-                player.grounded = false;
+            for(let i=0; i<snake.length; i++) {
+                ctx.fillStyle = (i == 0) ? "#2ecc71" : "#27ae60";
+                ctx.fillRect(snake[i].x, snake[i].y, box, box);
             }
+            ctx.fillStyle = "#e74c3c";
+            ctx.fillRect(food.x, food.y, box, box);
+
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+
+            if( d == "LEFT") snakeX -= box;
+            if( d == "UP") snakeY -= box;
+            if( d == "RIGHT") snakeX += box;
+            if( d == "DOWN") snakeY += box;
+
+            if(snakeX == food.x && snakeY == food.y) {
+                score++;
+                document.getElementById("scoreVal").innerHTML = score;
+                food = { x: Math.floor(Math.random()*15)*box, y: Math.floor(Math.random()*15)*box };
+            } else {
+                snake.pop();
+            }
+
+            let newHead = { x: snakeX, y: snakeY };
+
+            if(snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
+                clearInterval(game);
+                alert("Game Over! Skor: " + score);
+                location.reload();
+            }
+            snake.unshift(newHead);
         }
 
-        window.addEventListener('keydown', (e) => { if(e.code === 'Space') doJump(); });
-        canvas.addEventListener('touchstart', doJump);
+        function collision(head, array) {
+            for(let i=0; i<array.length; i++) {
+                if(head.x == array[i].x && head.y == array[i].y) return true;
+            }
+            return false;
+        }
 
-        draw();
+        let game = setInterval(draw, 150);
     </script>
 </body>
 </html>
