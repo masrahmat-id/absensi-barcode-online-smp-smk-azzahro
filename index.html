@@ -154,29 +154,18 @@
             z-index: 10001; display: none; background-color: var(--primary);
             color: white; border: 2px solid white; text-align: center; font-weight: bold;
         }
-
-        /* FITUR BARU: Indikator Offline */
-        #offline-indicator {
-            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-            background: #e74c3c; color: white; padding: 8px 20px;
-            border-radius: 50px; font-weight: bold; font-size: 12px;
-            z-index: 10002; display: none; border: 2px solid white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
         
         .overlay-about {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); z-index: 10001;
         }
         
-        #keterangan option[disabled] { display: none; }
+        #keterangan option[disabled] {
+            display: none; /* Menghilangkan opsi dari daftar setelah diklik */
+        }
     </style>
 </head>
-<body data-theme="dark" onclick="toggleFullscreen()"> 
-    <div id="status-kirim"></div>
-    <div id="offline-indicator">⚠️ ANDA SEDANG OFFLINE</div>
+<body data-theme="dark" onclick="toggleFullscreen()"> <div id="status-kirim"></div>
     <div id="about-overlay" class="overlay-about" onclick="closeAbout()"></div>
 
     <div class="main-app">
@@ -239,18 +228,25 @@
             <div class="setting-item"><span>Mode Terang</span><input type="checkbox" id="theme-toggle" onchange="previewLayout()"></div>
 
             <div class="btn-about-trigger" onclick="showAbout()">ⓘ Tentang Aplikasi</div>
+
             <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
         </div>
 
         <div id="about-pop-up">
             <h3 style="color:var(--primary); margin-top:0;">Tentang Aplikasi</h3>
             <p style="font-size:13px; line-height:1.6; text-align: left;">
-                "Aplikasi Absensi Digital SMP Islam & SMK Az-Zahro hadir sebagai solusi inovatif..."
+"Aplikasi Absensi Digital SMP Islam & SMK Az-Zahro hadir sebagai solusi inovatif 
+dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah.<br>
+Dengan fokus mentransformasi presensi konvensional menjadi sistem otomatis berbasis QR Code,
+aplikasi ini memastikan pendataan kehadiran berjalan cepat dan akurat.<br>
+Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi secara otomatis tanpa perlu rekapitulasi manual di akhir hari.<br>
+Inovasi ini memungkinkan tenaga pendidik untuk lebih fokus pada esensi utama sekolah, yakni meningkatkan kualitas kegiatan belajar mengajar."
             </p>
             <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; font-size:12px; text-align:left;">
-                <p><div style="text-align: center; font-size:15px; font-weight: bold;">IT DIGITALIZATION</div>
-                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 20px;">SMP ISLAM AZ-ZAHRO & SMK AZ-ZAHRO</div>
-                <strong>Created by ops:</strong> Rahmattullah<br></p>
+                <p><div style="text-align: center; font-size:15px; font-weight: bold;">
+                IT DIGITALIZATION</div>
+                    <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 20px;">SMP ISLAM AZ-ZAHRO & SMK AZ-ZAHRO</div>
+                    <strong>Created by ops:</strong> Rahmattullah<br></p>
                 <p><strong>Email:</strong> mas.rahmat.id@gmail.com</p>
             </div>
             <button class="btn-save" style="margin-top:15px; padding:10px;" onclick="closeAbout()">TUTUP</button>
@@ -258,22 +254,12 @@
     </div>
 
     <script>
-        // LOGIKA PENGECEKAN OFFLINE
-        function updateOnlineStatus() {
-            const indicator = document.getElementById('offline-indicator');
-            if (navigator.onLine) {
-                indicator.style.display = 'none';
-            } else {
-                indicator.style.display = 'block';
-            }
-        }
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-        updateOnlineStatus();
-
+        // FUNGSI BARU UNTUK FULLSCREEN
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(() => {});
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable full-screen mode: ${err.message}`);
+                });
                 document.getElementById('fullscreen-info').style.display = 'none';
             }
         }
@@ -289,6 +275,16 @@
             document.getElementById('clock-display').innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`.toUpperCase();
         }
         setInterval(updateClock, 1000); updateClock();
+
+        function showAbout() {
+            document.getElementById('about-pop-up').style.display = 'block';
+            document.getElementById('about-overlay').style.display = 'block';
+        }
+
+        function closeAbout() {
+            document.getElementById('about-pop-up').style.display = 'none';
+            document.getElementById('about-overlay').style.display = 'none';
+        }
 
         function applySettings() {
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || {
@@ -341,81 +337,87 @@
             toggleSettings();
         }
 
-        function showAbout() {
-            document.getElementById('about-pop-up').style.display = 'block';
-            document.getElementById('about-overlay').style.display = 'block';
-        }
-
-        function closeAbout() {
-            document.getElementById('about-pop-up').style.display = 'none';
-            document.getElementById('about-overlay').style.display = 'none';
-        }
-
         applySettings();
         const html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start({ facingMode: "environment" }, { fps: 25, qrbox: { width: 280, height: 280 }, aspectRatio: 0.75 }, 
-        (decodedText) => {
-            if (isProcessing) return;
+(decodedText) => {
+    if (isProcessing) return;
 
-            // VALIDASI KETERANGAN
-            const ketValue = document.getElementById('keterangan').value;
-            if (!ketValue || ketValue === "") {
-                const s = document.getElementById('status-kirim');
-                s.innerText = "✖ GAGAL: PILIH KETERANGAN DULU!";
-                s.style.backgroundColor = "#e74c3c";
-                s.style.display = "block";
-                setTimeout(() => { s.style.display = "none"; s.style.backgroundColor = "var(--primary)"; }, 2000);
-                return;
-            }
+    // --- VALIDASI KETERANGAN ---
+    const ketValue = document.getElementById('keterangan').value;
+    if (!ketValue || ketValue === "") {
+        const s = document.getElementById('status-kirim');
+        s.innerText = "✖ GAGAL: PILIH KETERANGAN DULU!";
+        s.style.backgroundColor = "#e74c3c"; // Warna merah untuk error
+        s.style.display = "block";
+        
+        // Mainkan suara peringatan jika perlu (opsional)
+        new Audio('error-sound.mp3').play().catch(() => {});
 
-            // VALIDASI ONLINE
-            if (!navigator.onLine) {
-                const s = document.getElementById('status-kirim');
-                s.innerText = "✖ GAGAL: TIDAK ADA INTERNET!";
-                s.style.backgroundColor = "#e74c3c";
-                s.style.display = "block";
-                setTimeout(() => { s.style.display = "none"; s.style.backgroundColor = "var(--primary)"; }, 2000);
-                return;
-            }
+        setTimeout(() => { 
+            s.style.display = "none"; 
+            s.style.backgroundColor = "var(--primary)"; // Kembalikan ke warna asli
+        }, 2000);
+        return; // Berhenti di sini, jangan kirim data
+    }
+    // ---------------------------
 
-            isProcessing = true;
-            document.getElementById('last-name-display').value = decodedText;
-            const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
-            new Audio(rawURL + config.sound).play().catch(() => {});
-            
-            fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ketValue)}`, { method: 'GET', mode: 'no-cors' });
-            
-            const s = document.getElementById('status-kirim');
-            s.innerText = "✔ TERKIRIM: " + decodedText;
-            s.style.display = "block";
-            setTimeout(() => { s.style.display = "none"; isProcessing = false; }, 2000);
-        }).catch(err => console.error(err));
+    isProcessing = true;
+    document.getElementById('last-name-display').value = decodedText;
+    const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
+    new Audio(rawURL + config.sound).play().catch(() => {});
+    
+    // Kirim data hanya jika lolos validasi di atas
+    fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ketValue)}`, { method: 'GET', mode: 'no-cors' });
+    
+    const s = document.getElementById('status-kirim');
+    s.innerText = "✔ TERKIRIM: " + decodedText;
+    s.style.display = "block";
+    setTimeout(() => { s.style.display = "none"; isProcessing = false; }, 2000);
+    }).catch(err => console.error(err));
     </script>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('SW terdaftar'))
-                .catch(err => console.log('SW Gagal:', err));
-            });
-        }
+  // 1. Registrasi Service Worker Anda (sw.js)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('SW terdaftar dengan versi: 1.0.1'))
+        .catch(err => console.log('SW Gagal:', err));
+    });
+  }
 
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            setTimeout(() => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-                }
-            }, 2000); 
-        });
+  // 2. Logika Pemicu Instalasi Otomatis
+  let deferredPrompt;
 
-        window.addEventListener('appinstalled', () => {
-            document.getElementById('fullscreen-info').style.display = 'none';
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Mencegah browser menampilkan prompt default (agar kita bisa kontrol waktunya)
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // Munculkan prompt otomatis setelah 2 detik halaman dimuat
+    setTimeout(() => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt(); // Tampilkan jendela instalasi
+        
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User menginstal aplikasi');
+          } else {
+            console.log('User menolak instalasi');
+          }
+          deferredPrompt = null;
         });
-    </script>
+      }
+    }, 2000); 
+  });
+
+  // Tambahan: Hilangkan petunjuk manual jika aplikasi sudah terinstal (PWA mode)
+  window.addEventListener('appinstalled', (evt) => {
+    console.log('Aplikasi berhasil diinstal!');
+    document.getElementById('fullscreen-info').style.display = 'none';
+  });
+</script>
+    
 </body>
 </html>
