@@ -3,64 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sedang Offline - App Anda</title>
+    <title>Offline - Main Dulu Yuk!</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
+        body { font-family: sans-serif; margin: 0; text-align: center; background: #f0f0f0; overflow: hidden; }
+        .info { padding: 20px; }
+        h1 { margin: 5px; color: #333; }
+        
+        /* Gaya Area Game */
+        #gameCanvas { 
+            background: #fff; 
+            border-bottom: 3px solid #333; 
+            display: block; 
+            margin: 0 auto;
+            max-width: 100%;
         }
-        .container {
-            padding: 20px;
-            max-width: 400px;
-        }
-        .icon {
-            font-size: 80px;
-            color: #bdc3c7;
-            margin-bottom: 20px;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        p {
-            color: #7f8c8d;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-        .btn-retry {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.3s ease;
-        }
-        .btn-retry:hover {
-            background-color: #2980b9;
+        .instructions { color: #777; font-size: 14px; margin-top: 10px; }
+        .btn-retry { 
+            margin-top: 20px; padding: 10px 20px; 
+            background: #3498db; color: white; border: none; 
+            border-radius: 5px; cursor: pointer; 
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="icon">📡</div>
-        
+    <div class="info">
         <h1>Koneksi Terputus</h1>
-        <p>Sepertinya perangkat Anda tidak terhubung ke internet. Silakan periksa koneksi Wi-Fi atau data seluler Anda.</p>
-        
-        <button class="btn-retry" onclick="window.location.reload()">Coba Lagi</button>
+        <p>Sambil menunggu sinyal, main dulu yuk!</p>
     </div>
 
+    <canvas id="gameCanvas" width="400" height="200"></canvas>
+    <p class="instructions">Ketuk layar atau tekan SPASI untuk lompat</p>
+
+    <button class="btn-retry" onclick="window.location.reload()">Cek Koneksi</button>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let score = 0;
+        let player = { x: 50, y: 150, w: 30, h: 30, dy: 0, jump: -8, grav: 0.5, grounded: false };
+        let obstacles = [];
+        let gameActive = true;
+
+        function drawPlayer() {
+            ctx.fillStyle = '#3498db';
+            ctx.fillRect(player.x, player.y, player.w, player.h);
+        }
+
+        function createObstacle() {
+            let size = 20 + Math.random() * 30;
+            obstacles.push({ x: 400, y: 200 - size, w: 20, h: size });
+        }
+
+        function update() {
+            if (!gameActive) return;
+
+            // Gravitasi
+            player.dy += player.grav;
+            player.y += player.dy;
+
+            if (player.y > 150) {
+                player.y = 150;
+                player.dy = 0;
+                player.grounded = true;
+            }
+
+            // Halangan
+            if (Math.random() < 0.02) createObstacle();
+
+            obstacles.forEach((obs, i) => {
+                obs.x -= 5;
+                if (obs.x + obs.w < 0) {
+                    obstacles.splice(i, 1);
+                    score++;
+                }
+
+                // Cek Tabrakan
+                if (player.x < obs.x + obs.w && player.x + player.w > obs.x &&
+                    player.y < obs.y + obs.h && player.y + player.h > obs.y) {
+                    gameActive = false;
+                    alert("Game Over! Skor Anda: " + score);
+                    location.reload();
+                }
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPlayer();
+            ctx.fillStyle = '#e74c3c';
+            obstacles.forEach(obs => ctx.fillRect(obs.x, obs.y, obs.w, obs.h));
+            
+            ctx.fillStyle = '#333';
+            ctx.fillText("Skor: " + score, 10, 20);
+            
+            update();
+            requestAnimationFrame(draw);
+        }
+
+        // Kontrol
+        function doJump() {
+            if (player.grounded) {
+                player.dy = player.jump;
+                player.grounded = false;
+            }
+        }
+
+        window.addEventListener('keydown', (e) => { if(e.code === 'Space') doJump(); });
+        canvas.addEventListener('touchstart', doJump);
+
+        draw();
+    </script>
 </body>
 </html>
