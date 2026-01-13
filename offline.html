@@ -153,9 +153,9 @@
             <div class="menu-selection">
                 <label>Level: </label>
                 <select id="mole-level" onchange="initMole()">
-                    <option value="easy">Santai (3 Wortel)</option>
-                    <option value="medium" selected>Sedang (2 Wortel)</option>
-                    <option value="hard">Pro (3 Wortel Cepat)</option>
+                    <option value="easy" selected>Santai</option>
+                    <option value="medium">Sedang</option>
+                    <option value="hard">Pro</option>
                 </select>
             </div>
             <div id="mole-lives">❤️❤️❤️❤️❤️</div>
@@ -420,9 +420,9 @@
             const level = document.getElementById('mole-level').value;
             let speed, carrotCount;
 
-            if(level === "easy") { speed = 1200; carrotCount = 3; }
-            else if(level === "medium") { speed = 800; carrotCount = 2; }
-            else { speed = 500; carrotCount = 3; }
+            if(level === "easy") { speed = 1000; carrotCount = 3; }
+            else if(level === "medium") { speed = 800; carrotCount = 4; }
+            else { speed = 600; carrotCount = 5; }
 
             moleLoop = setInterval(() => { 
                 // Reset posisi
