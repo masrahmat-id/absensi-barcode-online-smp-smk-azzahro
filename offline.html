@@ -3,63 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline - 2048 Game</title>
+    <title>Offline - Tangkap Kotak!</title>
     <style>
-        body { background: #faf8ef; color: #776e65; font-family: "Clear Sans", sans-serif; text-align: center; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        .grid-container { background: #bbada0; width: 300px; height: 300px; padding: 10px; border-radius: 6px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .tile { width: 65px; height: 65px; background: rgba(238, 228, 218, 0.35); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; }
-        .tile-2 { background: #eee4da; color: #776e65; }
-        .tile-4 { background: #ede0c8; color: #776e65; }
-        .tile-8 { background: #f2b179; color: white; }
-        .tile-16 { background: #f59563; color: white; }
-        .score-container { margin-bottom: 20px; font-size: 25px; font-weight: bold; }
-        .btn { padding: 10px 20px; background: #8f7a66; color: white; border: none; border-radius: 3px; cursor: pointer; margin-top: 20px; font-weight: bold; }
+        body { 
+            margin: 0; padding: 0; font-family: sans-serif; 
+            background: #121212; color: white; 
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; height: 100vh; overflow: hidden; 
+            user-select: none; -webkit-user-select: none;
+        }
+        #game-area {
+            width: 90vw; height: 60vh;
+            background: #1e1e1e; border: 2px solid #38bdf8;
+            border-radius: 15px; position: relative; overflow: hidden;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+        .target {
+            width: 50px; height: 50px;
+            background: #f43f5e; border-radius: 10px;
+            position: absolute; cursor: pointer;
+            box-shadow: 0 0 15px #f43f5e;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 20px;
+        }
+        .stats { margin-bottom: 15px; font-size: 20px; color: #38bdf8; }
+        .timer { color: #fb7185; margin-left: 20px; }
+        .btn {
+            margin-top: 20px; padding: 12px 25px;
+            background: #0ea5e9; color: white; border: none;
+            border-radius: 8px; font-weight: bold; cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Koneksi Terputus</h1>
-    <div class="score-container">Skor: <span id="score">0</span></div>
+    <div class="stats">Skor: <span id="score">0</span> <span class="timer">Waktu: <span id="time">30</span>s</span></div>
     
-    <div class="grid-container" id="grid">
-        </div>
+    <div id="game-area">
+        <div id="target" class="target" onclick="catchMe()">🎯</div>
+    </div>
 
-    <div style="margin-top: 20px;">Gunakan <b>Panah Keyboard</b> atau <b>Swipe</b></div>
     <button class="btn" onclick="window.location.reload()">Cek Koneksi</button>
 
     <script>
-        // Logika Game 2048 Sederhana
-        const gridDisplay = document.getElementById('grid');
-        const scoreDisplay = document.getElementById('score');
-        let width = 4;
-        let squares = [];
         let score = 0;
+        let timeLeft = 30;
+        let gameActive = true;
+        const target = document.getElementById('target');
+        const scoreDisplay = document.getElementById('score');
+        const timeDisplay = document.getElementById('time');
+        const area = document.getElementById('game-area');
 
-        function createBoard() {
-            for (let i = 0; i < width * width; i++) {
-                let tile = document.createElement('div');
-                tile.innerHTML = "";
-                tile.className = 'tile';
-                gridDisplay.appendChild(tile);
-                squares.push(tile);
+        function moveTarget() {
+            if (!gameActive) return;
+            
+            // Hitung batas area agar kotak tidak keluar jalur
+            const maxX = area.clientWidth - 60;
+            const maxY = area.clientHeight - 60;
+            
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+        }
+
+        function catchMe() {
+            if (!gameActive) return;
+            score++;
+            scoreDisplay.innerText = score;
+            moveTarget();
+        }
+
+        // Timer Game
+        const countdown = setInterval(() => {
+            timeLeft--;
+            timeDisplay.innerText = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                gameActive = false;
+                alert("Waktu Habis! Skor Akhir: " + score);
+                resetGame();
             }
-            generate();
-            generate();
+        }, 1000);
+
+        function resetGame() {
+            score = 0;
+            timeLeft = 30;
+            gameActive = true;
+            scoreDisplay.innerText = score;
+            timeDisplay.innerText = timeLeft;
+            moveTarget();
+            // Start ulang interval jika perlu, tapi untuk offline sederhana reload saja cukup
+            location.reload(); 
         }
 
-        function generate() {
-            let randomNumber = Math.floor(Math.random() * squares.length);
-            if (squares[randomNumber].innerHTML === "") {
-                squares[randomNumber].innerHTML = 2;
-                squares[randomNumber].classList.add('tile-2');
-            } else generate();
-        }
-
-        // Catatan: Untuk implementasi penuh 2048 membutuhkan logika geser yang panjang.
-        // Sebagai contoh cepat, kita siapkan papan visualnya terlebih dahulu.
-        createBoard();
-
-        // Tambahkan event listener untuk keyboard dan sentuhan di sini...
+        // Posisi awal
+        moveTarget();
     </script>
 </body>
 </html>
