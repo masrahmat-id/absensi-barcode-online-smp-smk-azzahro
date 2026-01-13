@@ -260,50 +260,83 @@
         }
 
         /* --- 2. LOGIKA SNAKE --- */
-        let snake, food, snakeDir, snakeScore, snakeLoop;
-        function initSnake() {
-            clearInterval(snakeLoop);
-            const canvas = document.getElementById('snakeCanvas');
-            const ctx = canvas.getContext('2d');
-            const box = 20;
-            snake = [{x: 8*box, y: 8*box}]; food = {x: 4*box, y: 4*box};
-            snakeDir = "RIGHT"; snakeScore = 0;
-            const speed = document.getElementById('snake-level').value;
+let snake, food, snakeDir, snakeScore, snakeLoop;
 
-            // Kontrol (Keyboard & Tap)
-            document.onkeydown = (e) => {
-                if(e.key === "ArrowUp" && snakeDir !== "DOWN") snakeDir = "UP";
-                if(e.key === "ArrowDown" && snakeDir !== "UP") snakeDir = "DOWN";
-                if(e.key === "ArrowLeft" && snakeDir !== "RIGHT") snakeDir = "LEFT";
-                if(e.key === "ArrowRight" && snakeDir !== "LEFT") snakeDir = "RIGHT";
+function initSnake() {
+    // Hentikan loop lama jika ada sebelum memulai yang baru
+    if (snakeLoop) clearInterval(snakeLoop);
+    
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d');
+    const box = 20;
+    snake = [{x: 8 * box, y: 8 * box}]; 
+    food = {x: 4 * box, y: 4 * box};
+    snakeDir = "RIGHT"; 
+    snakeScore = 0;
+    document.getElementById('snake-status').innerText = "Skor: 0";
+    
+    const speed = parseInt(document.getElementById('snake-level').value);
+
+    // Kontrol Keyboard
+    document.onkeydown = (e) => {
+        if(e.key === "ArrowUp" && snakeDir !== "DOWN") snakeDir = "UP";
+        if(e.key === "ArrowDown" && snakeDir !== "UP") snakeDir = "DOWN";
+        if(e.key === "ArrowLeft" && snakeDir !== "RIGHT") snakeDir = "LEFT";
+        if(e.key === "ArrowRight" && snakeDir !== "LEFT") snakeDir = "RIGHT";
+    };
+
+    snakeLoop = setInterval(() => {
+        ctx.fillStyle = "#1e293b"; ctx.fillRect(0,0,300,300);
+        
+        // Gambar Ular
+        for(let i=0; i<snake.length; i++) {
+            ctx.fillStyle = i==0 ? "#38bdf8" : "#94a3b8";
+            ctx.fillRect(snake[i].x, snake[i].y, box-1, box-1);
+        }
+        
+        // Gambar Makanan
+        ctx.fillStyle = "#fb7185"; 
+        ctx.fillRect(food.x, food.y, box-1, box-1);
+
+        let headX = snake[0].x; 
+        let headY = snake[0].y;
+        
+        if(snakeDir === "UP") headY -= box;
+        if(snakeDir === "DOWN") headY += box;
+        if(snakeDir === "LEFT") headX -= box;
+        if(snakeDir === "RIGHT") headX += box;
+
+        // Cek Makan
+        if(headX === food.x && headY === food.y) {
+            snakeScore++; 
+            document.getElementById('snake-status').innerText = "Skor: " + snakeScore;
+            food = {
+                x: Math.floor(Math.random() * 14 + 1) * box, 
+                y: Math.floor(Math.random() * 14 + 1) * box
             };
-
-            snakeLoop = setInterval(() => {
-                ctx.fillStyle = "#1e293b"; ctx.fillRect(0,0,300,300);
-                for(let i=0; i<snake.length; i++) {
-                    ctx.fillStyle = i==0 ? "#38bdf8" : "#94a3b8";
-                    ctx.fillRect(snake[i].x, snake[i].y, box, box);
-                }
-                ctx.fillStyle = "#fb7185"; ctx.fillRect(food.x, food.y, box, box);
-
-                let headX = snake[0].x; let headY = snake[0].y;
-                if(snakeDir === "UP") headY -= box;
-                if(snakeDir === "DOWN") headY += box;
-                if(snakeDir === "LEFT") headX -= box;
-                if(snakeDir === "RIGHT") headX += box;
-
-                if(headX === food.x && headY === food.y) {
-                    snakeScore++; food = {x: Math.floor(Math.random()*14+1)*box, y: Math.floor(Math.random()*14+1)*box};
-                } else snake.pop();
-
-                let newHead = {x: headX, y: headY};
-                if(headX<0||headX>=300||headY<0||headY>=300||snake.some(s=>s.x==newHead.x&&s.y==newHead.y)) {
-                    clearInterval(snakeLoop); alert("Game Over! Skor: " + snakeScore); initSnake();
-                }
-                snake.unshift(newHead);
-            }, speed);
+        } else {
+            snake.pop();
         }
 
+        let newHead = {x: headX, y: headY};
+
+        // CEK TABRAKAN (GAME OVER)
+        if(headX < 0 || headX >= 300 || headY < 0 || headY >= 300 || snake.some(s => s.x === newHead.x && s.y === newHead.y)) {
+            // PENTING: Hentikan loop SEBELUM alert muncul
+            clearInterval(snakeLoop);
+            
+            // Berikan jeda sedikit agar layar sempat terupdate sebelum alert muncul
+            setTimeout(() => {
+                alert("Game Over!\nSkor Anda: " + snakeScore);
+                // Setelah klik OK, kembalikan ke menu atau reset
+                initSnake(); 
+            }, 100);
+            return;
+        }
+        
+        snake.unshift(newHead);
+    }, speed);
+}
         /* --- 3. LOGIKA MATH QUIZ --- */
         let mathAns, mathScore = 0;
         function nextMath() {
