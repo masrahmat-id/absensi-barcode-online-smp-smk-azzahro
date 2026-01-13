@@ -2,8 +2,15 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Offline Game - Tic Tac Toe</title>
+    
+    <link rel="manifest" href="./manifest.json">
+    
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
         /* Dasar & Reset */
         * { 
@@ -21,6 +28,8 @@
             background: #0f172a;
             font-family: 'Segoe UI', sans-serif;
             color: #fff;
+            /* Support untuk area aman (Notch/Baterai) */
+            padding-top: env(safe-area-inset-top);
         }
 
         /* Container Utama */
@@ -119,18 +128,16 @@
             <button class="btn-online" onclick="window.location.reload()">Cek Koneksi</button>
         </div>
 
-        <div class="hint">Sentuh area luar untuk Layar Penuh</div>
+        <div class="hint">Sentuh area kosong untuk Layar Penuh</div>
     </div>
 
     <script>
         /* --- LOGIKA FULLSCREEN (ANTI-KEDIP) --- */
         function handleScreenClick(e) {
-            // Cek apakah sudah fullscreen
             const isFullscreen = document.fullscreenElement || 
                                  document.webkitFullscreenElement || 
                                  document.msFullscreenElement;
 
-            // Jika belum fullscreen, baru jalankan request
             if (!isFullscreen) {
                 let elem = document.documentElement;
                 if (elem.requestFullscreen) {
@@ -143,7 +150,7 @@
             }
         }
 
-        /* --- LOGIKA GAME --- */
+        /* --- LOGIKA GAME ASLI ANDA (TIDAK DIHAPUS) --- */
         let board = ["", "", "", "", "", "", "", "", ""];
         let huPlayer = "X";
         let aiPlayer = "O";
