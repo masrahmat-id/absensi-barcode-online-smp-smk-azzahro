@@ -143,10 +143,12 @@
         .setting-item { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
         .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; font-weight: bold; border: none; border-radius: 12px; margin-top: 25px; cursor: pointer; }
 
-        .btn-about-trigger {
-            margin-top: 20px; padding: 10px; border: 1px solid var(--primary);
+        .btn-about-trigger, .btn-database-trigger {
+            margin-top: 10px; padding: 10px; border: 1px solid var(--primary);
             border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: bold;
             color: var(--primary); background: rgba(46, 204, 113, 0.1);
+            text-align: center; display: block; width: 100%; box-sizing: border-box;
+            text-decoration: none;
         }
 
         #status-kirim {
@@ -162,7 +164,7 @@
         }
         
         #keterangan option[disabled] {
-            display: none; /* Menghilangkan opsi dari daftar setelah diklik */
+            display: none;
         }
     </style>
 </head>
@@ -228,6 +230,8 @@
             <div class="setting-item"><span>Warna Garis Tema</span><input type="color" id="color-picker" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Mode Terang</span><input type="checkbox" id="theme-toggle" onchange="previewLayout()"></div>
 
+            <a href="https://azzahrolocare.github.io/rekap-absensi/" target="_blank" class="btn-database-trigger">📊 Buka Database Absensi</a>
+
             <div class="btn-about-trigger" onclick="showAbout()">ⓘ Tentang Aplikasi</div>
 
             <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
@@ -255,11 +259,10 @@ Inovasi ini memungkinkan tenaga pendidik untuk lebih fokus pada esensi utama sek
     </div>
 
     <script>
-        // FUNGSI BARU UNTUK FULLSCREEN
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(err => {
-                    console.log(`Error attempting to enable full-screen mode: ${err.message}`);
+                    console.log(`Error: ${err.message}`);
                 });
                 document.getElementById('fullscreen-info').style.display = 'none';
             }
@@ -341,77 +344,33 @@ Inovasi ini memungkinkan tenaga pendidik untuk lebih fokus pada esensi utama sek
         applySettings();
         const html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start({ facingMode: "environment" }, { fps: 25, qrbox: { width: 280, height: 280 }, aspectRatio: 0.75 }, 
-(decodedText) => {
-    if (isProcessing) return;
+        (decodedText) => {
+            if (isProcessing) return;
+            const ketValue = document.getElementById('keterangan').value;
+            if (!ketValue || ketValue === "") {
+                const s = document.getElementById('status-kirim');
+                s.innerText = "✖ GAGAL: PILIH KETERANGAN DULU!";
+                s.style.backgroundColor = "#e74c3c";
+                s.style.display = "block";
+                setTimeout(() => { 
+                    s.style.display = "none"; 
+                    s.style.backgroundColor = "var(--primary)";
+                }, 2000);
+                return;
+            }
 
-    // --- VALIDASI KETERANGAN ---
-    const ketValue = document.getElementById('keterangan').value;
-    if (!ketValue || ketValue === "") {
-        const s = document.getElementById('status-kirim');
-        s.innerText = "✖ GAGAL: PILIH KETERANGAN DULU!";
-        s.style.backgroundColor = "#e74c3c"; // Warna merah untuk error
-        s.style.display = "block";
-        
-        // Mainkan suara peringatan jika perlu (opsional)
-        new Audio('error-sound.mp3').play().catch(() => {});
-
-        setTimeout(() => { 
-            s.style.display = "none"; 
-            s.style.backgroundColor = "var(--primary)"; // Kembalikan ke warna asli
-        }, 2000);
-        return; // Berhenti di sini, jangan kirim data
-    }
-    // ---------------------------
-
-    isProcessing = true;
-    document.getElementById('last-name-display').value = decodedText;
-    const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
-    new Audio(rawURL + config.sound).play().catch(() => {});
-    
-    // Kirim data hanya jika lolos validasi di atas
-    fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ketValue)}`, { method: 'GET', mode: 'no-cors' });
-    
-    const s = document.getElementById('status-kirim');
-    s.innerText = "✔ TERKIRIM: " + decodedText;
-    s.style.display = "block";
-    setTimeout(() => { s.style.display = "none"; isProcessing = false; }, 2000);
-    }).catch(err => console.error(err));
+            isProcessing = true;
+            document.getElementById('last-name-display').value = decodedText;
+            const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
+            new Audio(rawURL + config.sound).play().catch(() => {});
+            
+            fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ketValue)}`, { method: 'GET', mode: 'no-cors' });
+            
+            const s = document.getElementById('status-kirim');
+            s.innerText = "✔ TERKIRIM: " + decodedText;
+            s.style.display = "block";
+            setTimeout(() => { s.style.display = "none"; isProcessing = false; }, 2000);
+        }).catch(err => console.error(err));
     </script>
-
-   <script>
-  // REGISTRASI SERVICE WORKER & LOGIKA PWA
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('SW terdaftar (v1.0.1)'))
-        .catch(err => console.error('SW Gagal:', err));
-    });
-  }
-
-  // LOGIKA INSTALASI OTOMATIS
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-
-    // Munculkan prompt instalasi setelah 2 detik
-    setTimeout(() => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          console.log(choiceResult.outcome === 'accepted' ? 'User menginstal' : 'User menolak');
-          deferredPrompt = null;
-        });
-      }
-    }, 2000); 
-  });
-
-  // HILANGKAN INFO JIKA SUDAH TERINSTAL
-  window.addEventListener('appinstalled', (evt) => {
-    console.log('Aplikasi Berhasil Diinstal!');
-    const info = document.getElementById('fullscreen-info');
-    if (info) info.style.display = 'none';
-  });
-</script>
 </body>
 </html>
