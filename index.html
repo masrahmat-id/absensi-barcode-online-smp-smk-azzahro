@@ -132,6 +132,8 @@
             max-height: 85vh; overflow-y: auto;
         }
 
+        #about-pop-up { z-index: 10002; text-align: center; }
+
         .modal-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px; border-bottom: 1px solid var(--primary); padding-bottom: 10px;
@@ -149,6 +151,13 @@
             box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); transition: all 0.3s ease;
         }
 
+        .btn-about-trigger {
+            margin-top: 10px; padding: 10px; border: 1px solid var(--primary);
+            border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: bold;
+            color: var(--primary); background: rgba(46, 204, 113, 0.1);
+            text-align: center; display: block;
+        }
+
         #status-kirim {
             position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
             width: 80%; padding: 15px; border-radius: 15px;
@@ -161,13 +170,12 @@
             background: rgba(0,0,0,0.7); z-index: 10001;
         }
 
-        /* KHUSUS GRADIEN SECTION */
         #gradient-controls {
-            display: none;
-            border-top: 1px dashed var(--primary);
-            margin-top: 10px;
-            padding-top: 10px;
+            display: none; border-top: 1px dashed var(--primary);
+            margin-top: 10px; padding-top: 10px;
         }
+
+        #keterangan option[disabled] { display: none; }
     </style>
 </head>
 <body data-theme="dark" onclick="toggleFullscreen()"> <div id="status-kirim"></div>
@@ -251,10 +259,31 @@
             <div class="setting-item"><span>Mode Terang</span><input type="checkbox" id="theme-toggle" onchange="previewLayout()"></div>
 
             <a href="https://azzahrolocare.github.io/rekap-absensi/" target="_blank" class="btn-database-trigger" id="btn-rekap">
-                BUKA REKAPITULASI
+                BUKA REKAPITULASI PRESENSI SISWA
             </a>
 
+            <div class="btn-about-trigger" onclick="showAbout()">ⓘ Tentang Aplikasi</div>
+
             <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
+        </div>
+
+        <div id="about-pop-up">
+            <h3 style="color:var(--primary); margin-top:0;">Tentang Aplikasi</h3>
+            <p style="font-size:13px; line-height:1.6; text-align: left;">
+"Aplikasi Absensi Digital SMP Islam & SMK Az-Zahro hadir sebagai solusi inovatif 
+dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah.<br>
+Dengan fokus mentransformasi presensi konvensional menjadi sistem otomatis berbasis QR Code,
+aplikasi ini memastikan pendataan kehadiran berjalan cepat dan akurat.<br>
+Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi secara otomatis tanpa perlu rekapitulasi manual di akhir hari."
+            </p>
+            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; font-size:12px; text-align:left;">
+                <p><div style="text-align: center; font-size:15px; font-weight: bold;">
+                IT DIGITALIZATION</div>
+                    <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 20px;">SMP ISLAM AZ-ZAHRO & SMK AZ-ZAHRO</div>
+                    <strong>Created by ops:</strong> Rahmattullah<br></p>
+                <p><strong>Email:</strong> mas.rahmat.id@gmail.com</p>
+            </div>
+            <button class="btn-save" style="margin-top:15px; padding:10px;" onclick="closeAbout()">TUTUP</button>
         </div>
     </div>
 
@@ -277,6 +306,16 @@
             document.getElementById('clock-display').innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`.toUpperCase();
         }
         setInterval(updateClock, 1000); updateClock();
+
+        function showAbout() {
+            document.getElementById('about-pop-up').style.display = 'block';
+            document.getElementById('about-overlay').style.display = 'block';
+        }
+
+        function closeAbout() {
+            document.getElementById('about-pop-up').style.display = 'none';
+            document.getElementById('about-overlay').style.display = 'none';
+        }
 
         function applySettings() {
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || {
