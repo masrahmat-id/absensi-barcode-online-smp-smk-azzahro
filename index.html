@@ -6,15 +6,11 @@
     <title>Absensi Digital - Az-Zahro</title>
     
     <link rel="manifest" href="manifest.json">
-    
-    <meta name="theme-color" content="#2ecc71" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
-    
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#2c3e50" media="(prefers-color-scheme: dark)">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://github.com/masrahmat-id/absensi/raw/main/icon-absensi-azzahro%20(1).png">
-    <meta name="apple-mobile-web-app-title" content="Absensi Az-Zahro">
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
@@ -26,15 +22,6 @@
             --header-font-size: 0.9rem;
             --logo-size: 65px;
             --header-text-color: #2ecc71;
-        }
-
-        /* Mode Terang Otomatis untuk Bar Bawah & Body */
-        @media (prefers-color-scheme: light) {
-            :root {
-                --bg-body: #f0f2f5;
-                --bg-card: #ffffff;
-                --text-main: #1a1a1a;
-            }
         }
 
         [data-theme="light"] {
@@ -241,26 +228,20 @@
             <div class="setting-item"><span>Warna Latar</span><input type="color" id="color-bg" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Warna Garis Tema</span><input type="color" id="color-picker" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Mode Terang</span><input type="checkbox" id="theme-toggle" onchange="previewLayout()"></div>
-            <div style="margin-top: 15px; text-align: center;">
-            <a href="https://azzahrolocare.github.io/rekap-absensi/" target="_blank" style="color: var(--primary); font-size: 13px; 
-                text-decoration: none; font-weight: bold; display: block; padding: 10px; border: 1px dashed var(--primary); border-radius: 10px;">📊 LIHAT REKAP ABSENSI</a>
-            </div>
 
             <div class="btn-about-trigger" onclick="showAbout()">ⓘ Tentang Aplikasi</div>
-
             <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
         </div>
 
         <div id="about-pop-up">
             <h3 style="color:var(--primary); margin-top:0;">Tentang Aplikasi</h3>
             <p style="font-size:13px; line-height:1.6; text-align: left;">
-"Aplikasi Absensi Digital SMP Islam & SMK Az-Zahro hadir sebagai solusi inovatif 
-dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah."
+                "Aplikasi Absensi Digital SMP Islam & SMK Az-Zahro hadir sebagai solusi inovatif dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah."
             </p>
             <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; font-size:12px; text-align:left;">
-                <p><div style="text-align: center; font-size:15px; font-weight: bold;">IT DIGITALIZATION</div>
-                    <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 20px;">SMP ISLAM AZ-ZAHRO & SMK AZ-ZAHRO</div>
-                    <strong>Created by ops:</strong> Rahmattullah<br></p>
+                <div style="text-align: center; font-size:15px; font-weight: bold;">IT DIGITALIZATION</div>
+                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 10px;">SMP ISLAM AZ-ZAHRO & SMK AZ-ZAHRO</div>
+                <p><strong>Created by ops:</strong> Rahmattullah</p>
                 <p><strong>Email:</strong> mas.rahmat.id@gmail.com</p>
             </div>
             <button class="btn-save" style="margin-top:15px; padding:10px;" onclick="closeAbout()">TUTUP</button>
@@ -268,17 +249,19 @@ dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah."
     </div>
 
     <script>
-        // --- LOGIKA ASLI TETAP DI SINI ---
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => { console.log(err.message); });
-                document.getElementById('fullscreen-info').style.display = 'none';
-            }
-        }
-
+        // GLOBAL VARIABLES
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwCXbDTuaFkN7GlcXJxaFgDaKPEp2G9vySF1IKfWxUCTuEOCYt39nMmlEmI25pz4PSd/exec';
         const rawURL = 'https://github.com/masrahmat-id/absensi/raw/main/';
         let isProcessing = false;
+        let deferredPrompt;
+
+        // 1. FULLSCREEN & CLOCK
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err.message));
+                document.getElementById('fullscreen-info').style.display = 'none';
+            }
+        }
 
         function updateClock() {
             const now = new Date();
@@ -286,11 +269,25 @@ dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah."
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             document.getElementById('clock-display').innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} | ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`.toUpperCase();
         }
-        setInterval(updateClock, 1000); updateClock();
+        setInterval(updateClock, 1000); 
+        updateClock();
 
-        function showAbout() { document.getElementById('about-pop-up').style.display = 'block'; document.getElementById('about-overlay').style.display = 'block'; }
-        function closeAbout() { document.getElementById('about-pop-up').style.display = 'none'; document.getElementById('about-overlay').style.display = 'none'; }
+        // 2. MODAL CONTROLS
+        function showAbout() {
+            document.getElementById('about-pop-up').style.display = 'block';
+            document.getElementById('about-overlay').style.display = 'block';
+        }
+        function closeAbout() {
+            document.getElementById('about-pop-up').style.display = 'none';
+            document.getElementById('about-overlay').style.display = 'none';
+        }
+        function toggleSettings() {
+            const m = document.getElementById('settings-modal');
+            m.style.display = m.style.display === 'block' ? 'none' : 'block';
+        }
+        function cancelSettings() { applySettings(); toggleSettings(); }
 
+        // 3. SETTINGS ENGINE
         function applySettings() {
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || {
                 sound: 'Notif01.mp3', theme: 'dark', primary: '#2ecc71',
@@ -302,6 +299,8 @@ dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah."
             document.documentElement.style.setProperty('--header-font-size', config.fontSize + 'rem');
             document.documentElement.style.setProperty('--header-text-color', config.textColor);
             document.documentElement.style.setProperty('--bg-body', config.bgColor);
+            
+            // Sync Input UI
             document.getElementById('sound-choice').value = config.sound;
             document.getElementById('color-picker').value = config.primary;
             document.getElementById('range-logo').value = config.logoSize;
@@ -320,13 +319,6 @@ dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah."
             document.body.setAttribute('data-theme', document.getElementById('theme-toggle').checked ? 'light' : 'dark');
         }
 
-        function toggleSettings() {
-            const m = document.getElementById('settings-modal');
-            m.style.display = m.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function cancelSettings() { applySettings(); toggleSettings(); }
-
         function saveSettings() {
             const config = {
                 sound: document.getElementById('sound-choice').value,
@@ -342,11 +334,13 @@ dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah."
             toggleSettings();
         }
 
+        // 4. QR SCANNER ENGINE
         applySettings();
         const html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start({ facingMode: "environment" }, { fps: 25, qrbox: { width: 280, height: 280 }, aspectRatio: 0.75 }, 
         (decodedText) => {
             if (isProcessing) return;
+
             const ketValue = document.getElementById('keterangan').value;
             if (!ketValue) {
                 const s = document.getElementById('status-kirim');
@@ -356,39 +350,45 @@ dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah."
                 setTimeout(() => { s.style.display = "none"; s.style.backgroundColor = "var(--primary)"; }, 2000);
                 return;
             }
+
             isProcessing = true;
             document.getElementById('last-name-display').value = decodedText;
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
             new Audio(rawURL + config.sound).play().catch(() => {});
+            
             fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ketValue)}`, { method: 'GET', mode: 'no-cors' });
+            
             const s = document.getElementById('status-kirim');
             s.innerText = "✔ TERKIRIM: " + decodedText;
             s.style.display = "block";
             setTimeout(() => { s.style.display = "none"; isProcessing = false; }, 2000);
         }).catch(err => console.error(err));
-    </script>
 
-    <script>
-        let deferredPrompt;
+        // 5. SERVICE WORKER & PWA LOGIC (DIPERBAIKI/DIPADUKAN)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW terdaftar: 1.0.1'));
+                navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('SW terdaftar'))
+                .catch(err => console.log('SW Gagal:', err));
             });
         }
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             setTimeout(() => {
                 if (deferredPrompt) {
                     deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then((choiceResult) => {
-                        if (choiceResult.outcome === 'accepted') console.log('Aplikasi Diinstal');
+                    deferredPrompt.userChoice.then((choice) => {
                         deferredPrompt = null;
                     });
                 }
             }, 2000); 
         });
-        window.addEventListener('appinstalled', () => { document.getElementById('fullscreen-info').style.display = 'none'; });
+
+        window.addEventListener('appinstalled', () => {
+            document.getElementById('fullscreen-info').style.display = 'none';
+        });
     </script>
 </body>
 </html>
