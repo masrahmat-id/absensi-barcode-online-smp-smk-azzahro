@@ -19,16 +19,14 @@
             --bg-body: #121212;
             --bg-gradient: none;
             --bg-card: #1e1e1e;
-            --text-main: #ffffff; /* Warna tulisan utama */
+            --text-main: #ffffff;
             --header-font-size: 0.9rem;
             --logo-size: 65px;
-            --header-text-color: #2ecc71; /* Warna teks header khusus */
         }
 
         [data-theme="light"] {
             --bg-body: #f0f2f5;
             --bg-card: #ffffff;
-            /* Kita tidak lagi memaksa --text-main di sini agar tetap sesuai pilihan user */
         }
 
         html, body {
@@ -61,9 +59,10 @@
 
         .header-container img { width: var(--logo-size); height: var(--logo-size); object-fit: contain; }
 
+        /* NAMA SEKOLAH - SEKARANG MENGIKUTI WARNA TEKS UTAMA */
         .header-container h3 {
             margin: 0; font-size: var(--header-font-size);
-            line-height: 1.1; color: var(--header-text-color); font-weight: 800;
+            line-height: 1.1; color: var(--text-main); font-weight: 800;
         }
 
         .datetime-display {
@@ -138,12 +137,15 @@
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 10px; border-bottom: 1px solid var(--primary); padding-bottom: 8px;
         }
+        
+        /* JUDUL MODAL - SEKARANG MENGIKUTI WARNA TEKS UTAMA */
+        .modal-header span, #about-pop-up h3 { color: var(--text-main) !important; }
 
         .btn-close-modal { background: none; border: none; color: var(--text-main); font-size: 24px; font-weight: bold; cursor: pointer; }
         
         .setting-item { 
             display: flex; justify-content: space-between; align-items: center; 
-            margin-top: 8px; gap: 8px; font-size: 13px;
+            margin-top: 8px; gap: 8px; font-size: 13px; color: var(--text-main);
         }
         
         input[type="range"] { height: 4px; flex-grow: 1; }
@@ -225,14 +227,14 @@
 
         <div id="settings-modal">
             <div class="modal-header">
-                <span style="font-weight: bold; color:var(--primary); font-size: 16px;">Pengaturan</span>
+                <span style="font-weight: bold; font-size: 16px;">Pengaturan</span>
                 <button class="btn-close-modal" onclick="cancelSettings()">×</button>
             </div>
             
             <div class="section-title">Umum & Suara</div>
             <div class="setting-item">
                 <span>Notifikasi</span>
-                <select id="sound-choice" style="height: 28px; font-size: 12px; width: 60%;">
+                <select id="sound-choice" style="height: 28px; font-size: 12px; width: 60%; color: #000;">
                     <option value="Notif01.mp3">Notif 01</option>
                     <option value="Notif02.mp3">Notif 02</option>
                     <option value="Notif03.mp3">Notif 03</option>
@@ -248,12 +250,12 @@
             <div class="setting-item"><span>Font</span><input type="range" id="range-font" min="0.5" max="1.5" step="0.05" oninput="previewLayout()"></div>
             
             <div class="setting-item">
-                <span title="Warna Teks Utama">Teks</span><input type="color" id="color-text" oninput="previewLayout()">
-                <span title="Warna Garis & Tombol">Garis</span><input type="color" id="color-picker" oninput="previewLayout()">
-                <span title="Warna Latar Solid">Latar</span><input type="color" id="color-bg" oninput="previewLayout()">
+                <span>Teks</span><input type="color" id="color-text" oninput="previewLayout()">
+                <span>Garis</span><input type="color" id="color-picker" oninput="previewLayout()">
+                <span>Latar</span><input type="color" id="color-bg" oninput="previewLayout()">
             </div>
             
-            <div class="setting-item" style="background: rgba(46, 204, 113, 0.1); padding: 5px; border-radius: 5px;">
+            <div class="setting-item" style="border: 1px solid var(--primary); padding: 5px; border-radius: 5px;">
                 <span style="font-weight: bold;">Gunakan Gradien</span>
                 <input type="checkbox" id="gradient-toggle" onchange="previewLayout()">
             </div>
@@ -265,8 +267,8 @@
                     <span>Bawah</span><input type="color" id="grad-3" oninput="previewLayout()">
                 </div>
                 <div class="setting-item">
-                    <span>Arah Aliran</span>
-                    <select id="grad-dir" onchange="previewLayout()" style="height: 25px; font-size: 11px; width: 100px;">
+                    <span>Arah</span>
+                    <select id="grad-dir" onchange="previewLayout()" style="height: 25px; font-size: 11px; width: 100px; color: #000;">
                         <option value="180deg">Vertikal</option>
                         <option value="90deg">Horizontal</option>
                         <option value="45deg">Diagonal</option>
@@ -274,7 +276,7 @@
                 </div>
             </div>
 
-            <div class="setting-item"><span>Mode Terang (Light)</span><input type="checkbox" id="theme-toggle" onchange="previewLayout()"></div>
+            <div class="setting-item"><span>Mode Terang</span><input type="checkbox" id="theme-toggle" onchange="previewLayout()"></div>
 
             <a href="https://azzahrolocare.github.io/rekap-absensi/" target="_blank" class="btn-database-trigger" id="btn-rekap">
                 REKAPITULASI PRESENSI SISWA
@@ -286,7 +288,7 @@
         </div>
 
         <div id="about-pop-up">
-            <h3 style="color:var(--primary); margin-top:0; font-size: 18px;">Tentang Aplikasi</h3>
+            <h3 style="margin-top:0; font-size: 18px;">Tentang Aplikasi</h3>
             <p style="font-size:12px; line-height:1.6; text-align: left; opacity: 0.9;">
 "Aplikasi Absensi Digital SMP Islam & SMK Az-Zahro hadir sebagai solusi inovatif dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah.<br><br>
 Dengan fokus mentransformasi presensi konvensional menjadi sistem otomatis berbasis QR Code, aplikasi ini memastikan pendataan kehadiran berjalan cepat dan akurat.<br><br>
@@ -294,7 +296,7 @@ Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi se
             </p>
             <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; font-size:11px; text-align:left; border-left: 3px solid var(--primary);">
                 <div style="text-align: center; font-size:13px; font-weight: bold; color: var(--primary);">IT DIGITALIZATION</div>
-                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 15px; font-size: 10px;">SMP ISLAM AZ-ZAHRO & SMK AZ-ZAHRO</div>
+                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 15px; font-size: 10px; color: var(--text-main);">SMP ISLAM AZ-ZAHRO & SMK AZ-ZAHRO</div>
                 <p style="margin: 5px 0;"><strong>Created by ops:</strong> Rahmattullah</p>
                 <p style="margin: 5px 0;"><strong>Email:</strong> mas.rahmat.id@gmail.com</p>
             </div>
@@ -362,10 +364,8 @@ Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi se
             const textColor = document.getElementById('color-text').value;
             const gradSection = document.getElementById('gradient-controls');
 
-            // Set Warna Tulisan secara Independen
+            // Apply global text color
             document.documentElement.style.setProperty('--text-main', textColor);
-            document.documentElement.style.setProperty('--header-text-color', primary); // Header mengikuti warna tema/garis agar kontras
-
             document.documentElement.style.setProperty('--primary', primary);
             document.documentElement.style.setProperty('--logo-size', document.getElementById('range-logo').value + 'px');
             document.documentElement.style.setProperty('--header-font-size', document.getElementById('range-font').value + 'rem');
