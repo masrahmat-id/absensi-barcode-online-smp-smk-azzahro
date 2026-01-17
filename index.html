@@ -17,7 +17,7 @@
         :root {
             --primary: #2ecc71;
             --bg-body: #121212;
-            --bg-gradient: linear-gradient(180deg, #121212 0%, #000000 100%);
+            --bg-gradient: none;
             --bg-card: #1e1e1e;
             --text-main: #ffffff;
             --header-font-size: 0.9rem;
@@ -34,8 +34,8 @@
         html, body {
             height: 100%; margin: 0; padding: 0;
             overflow: hidden; 
-            background: var(--bg-body);
-            background: var(--bg-gradient);
+            background-color: var(--bg-body);
+            background-image: var(--bg-gradient);
             overscroll-behavior: none; touch-action: none; 
             position: fixed; width: 100%;
         }
@@ -44,7 +44,7 @@
             font-family: 'Segoe UI', Roboto, sans-serif;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            color: var(--text-main); transition: background 0.4s ease;
+            color: var(--text-main); transition: all 0.4s ease;
         }
 
         .main-app {
@@ -56,13 +56,10 @@
 
         .header-container {
             display: flex; align-items: center; justify-content: center;
-            gap: 15px; margin-bottom: 10px;
-            margin-top: 5px; 
+            gap: 15px; margin-bottom: 10px; margin-top: 5px; 
         }
 
-        .header-container img {
-            width: var(--logo-size); height: var(--logo-size); object-fit: contain;
-        }
+        .header-container img { width: var(--logo-size); height: var(--logo-size); object-fit: contain; }
 
         .header-container h3 {
             margin: 0; font-size: var(--header-font-size);
@@ -113,8 +110,7 @@
         .scan-line {
             width: 280px; height: 3px; background: var(--primary);
             position: absolute; left: 50%; transform: translateX(-50%);
-            z-index: 15;
-            animation: scanAnim 3s infinite ease-in-out;
+            z-index: 15; animation: scanAnim 3s infinite ease-in-out;
             box-shadow: 0 0 20px var(--primary);
         }
 
@@ -136,8 +132,6 @@
             max-height: 85vh; overflow-y: auto;
         }
 
-        #about-pop-up { z-index: 10002; text-align: center; }
-
         .modal-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px; border-bottom: 1px solid var(--primary); padding-bottom: 10px;
@@ -148,22 +142,11 @@
         .btn-save { width: 100%; padding: 15px; background: var(--primary); color: white; font-weight: bold; border: none; border-radius: 12px; margin-top: 25px; cursor: pointer; }
 
         .btn-database-trigger {
-            margin-top: 20px; padding: 12px; 
-            border: 2px solid var(--primary); border-radius: 12px; 
-            cursor: pointer; font-size: 14px; font-weight: 800;
-            color: white; background: var(--primary);
-            text-align: center; display: flex; 
-            align-items: center; justify-content: center; gap: 10px;
+            margin-top: 20px; padding: 12px; border: 2px solid var(--primary); border-radius: 12px; 
+            cursor: pointer; font-size: 14px; font-weight: 800; color: white; background: var(--primary);
+            text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px;
             width: 100%; box-sizing: border-box; text-decoration: none;
-            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .btn-about-trigger {
-            margin-top: 10px; padding: 10px; border: 1px solid var(--primary);
-            border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: bold;
-            color: var(--primary); background: rgba(46, 204, 113, 0.1);
-            text-align: center; display: block;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); transition: all 0.3s ease;
         }
 
         #status-kirim {
@@ -177,8 +160,14 @@
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); z-index: 10001;
         }
-        
-        #keterangan option[disabled] { display: none; }
+
+        /* KHUSUS GRADIEN SECTION */
+        #gradient-controls {
+            display: none;
+            border-top: 1px dashed var(--primary);
+            margin-top: 10px;
+            padding-top: 10px;
+        }
     </style>
 </head>
 <body data-theme="dark" onclick="toggleFullscreen()"> <div id="status-kirim"></div>
@@ -205,10 +194,8 @@
         </div>
 
         <div class="scanner-box">
-            <div class="corner top-left"></div>
-            <div class="corner top-right"></div>
-            <div class="corner bottom-left"></div>
-            <div class="corner bottom-right"></div>
+            <div class="corner top-left"></div><div class="corner top-right"></div>
+            <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
             <div class="scan-line"></div>
             <div id="reader"></div>
         </div>
@@ -240,42 +227,34 @@
             <div class="setting-item"><span>Ukuran Tulisan</span><input type="range" id="range-font" min="0.5" max="1.5" step="0.05" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Warna Tulisan</span><input type="color" id="color-text" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Warna Garis Tema</span><input type="color" id="color-picker" oninput="previewLayout()"></div>
-
-            <hr style="border: 0.5px solid var(--primary); opacity: 0.3; margin: 15px 0;">
-            <p style="font-size: 11px; font-weight: bold; margin-bottom: 5px;">CUSTOM GRADIEN LATAR:</p>
+            <div class="setting-item"><span>Warna Latar (Solid)</span><input type="color" id="color-bg" oninput="previewLayout()"></div>
             
-            <div class="setting-item"><span>Warna Atas</span><input type="color" id="grad-1" oninput="previewLayout()"></div>
-            <div class="setting-item"><span>Warna Tengah</span><input type="color" id="grad-2" oninput="previewLayout()"></div>
-            <div class="setting-item"><span>Warna Bawah</span><input type="color" id="grad-3" oninput="previewLayout()"></div>
             <div class="setting-item">
-                <span>Arah Gradien</span>
-                <select id="grad-dir" onchange="previewLayout()" style="height: 30px; border-radius: 5px; font-size: 12px; border: 1px solid var(--primary);">
-                    <option value="180deg">Vertikal (↓)</option>
-                    <option value="90deg">Horizontal (→)</option>
-                    <option value="45deg">Diagonal (↘)</option>
-                </select>
+                <span style="font-weight: bold; color: var(--primary);">AKTIFKAN GRADIEN</span>
+                <input type="checkbox" id="gradient-toggle" onchange="previewLayout()">
+            </div>
+
+            <div id="gradient-controls">
+                <div class="setting-item"><span>Warna Atas</span><input type="color" id="grad-1" oninput="previewLayout()"></div>
+                <div class="setting-item"><span>Warna Tengah</span><input type="color" id="grad-2" oninput="previewLayout()"></div>
+                <div class="setting-item"><span>Warna Bawah</span><input type="color" id="grad-3" oninput="previewLayout()"></div>
+                <div class="setting-item">
+                    <span>Arah</span>
+                    <select id="grad-dir" onchange="previewLayout()" style="height: 30px; font-size: 12px;">
+                        <option value="180deg">Vertikal ↓</option>
+                        <option value="90deg">Horizontal →</option>
+                        <option value="45deg">Diagonal ↘</option>
+                    </select>
+                </div>
             </div>
 
             <div class="setting-item"><span>Mode Terang</span><input type="checkbox" id="theme-toggle" onchange="previewLayout()"></div>
 
             <a href="https://azzahrolocare.github.io/rekap-absensi/" target="_blank" class="btn-database-trigger" id="btn-rekap">
-                BUKA REKAPITULASI PRESENSI SISWA
+                BUKA REKAPITULASI
             </a>
 
-            <div class="btn-about-trigger" onclick="showAbout()">ⓘ Tentang Aplikasi</div>
-
             <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
-        </div>
-
-        <div id="about-pop-up">
-            <h3 style="color:var(--primary); margin-top:0;">Tentang Aplikasi</h3>
-            <p style="font-size:13px; line-height:1.6; text-align: left;">
-"Aplikasi Absensi Digital SMP Islam & SMK Az-Zahro hadir sebagai solusi inovatif dalam mendukung digitalisasi pendidikan."
-            </p>
-            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; font-size:12px; text-align:left;">
-                <p><strong>Created by ops:</strong> Rahmattullah<br></p>
-            </div>
-            <button class="btn-save" style="margin-top:15px; padding:10px;" onclick="closeAbout()">TUTUP</button>
         </div>
     </div>
 
@@ -299,21 +278,11 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        function showAbout() {
-            document.getElementById('about-pop-up').style.display = 'block';
-            document.getElementById('about-overlay').style.display = 'block';
-        }
-
-        function closeAbout() {
-            document.getElementById('about-pop-up').style.display = 'none';
-            document.getElementById('about-overlay').style.display = 'none';
-        }
-
         function applySettings() {
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || {
                 sound: 'Notif01.mp3', theme: 'dark', primary: '#2ecc71',
-                logoSize: '65', fontSize: '0.9', textColor: '#2ecc71',
-                grad1: '#121212', grad2: '#1e1e1e', grad3: '#000000', gradDir: '180deg'
+                logoSize: '65', fontSize: '0.9', textColor: '#2ecc71', bgColor: '#121212',
+                useGrad: false, g1: '#121212', g2: '#1e1e1e', g3: '#000000', gDir: '180deg'
             };
             
             document.getElementById('sound-choice').value = config.sound;
@@ -321,36 +290,43 @@
             document.getElementById('range-logo').value = config.logoSize;
             document.getElementById('range-font').value = config.fontSize;
             document.getElementById('color-text').value = config.textColor;
+            document.getElementById('color-bg').value = config.bgColor || '#121212';
             document.getElementById('theme-toggle').checked = (config.theme === 'light');
             
-            // Set Gradient Inputs
-            document.getElementById('grad-1').value = config.grad1 || '#121212';
-            document.getElementById('grad-2').value = config.grad2 || '#1e1e1e';
-            document.getElementById('grad-3').value = config.grad3 || '#000000';
-            document.getElementById('grad-dir').value = config.gradDir || '180deg';
+            document.getElementById('gradient-toggle').checked = config.useGrad;
+            document.getElementById('grad-1').value = config.g1;
+            document.getElementById('grad-2').value = config.g2;
+            document.getElementById('grad-3').value = config.g3;
+            document.getElementById('grad-dir').value = config.gDir;
 
             previewLayout();
         }
 
         function previewLayout() {
+            const useGrad = document.getElementById('gradient-toggle').checked;
             const primary = document.getElementById('color-picker').value;
-            const tColor = document.getElementById('color-text').value;
-            const g1 = document.getElementById('grad-1').value;
-            const g2 = document.getElementById('grad-2').value;
-            const g3 = document.getElementById('grad-3').value;
-            const gDir = document.getElementById('grad-dir').value;
+            const bgSolid = document.getElementById('color-bg').value;
+            const gradSection = document.getElementById('gradient-controls');
 
             document.documentElement.style.setProperty('--primary', primary);
-            document.documentElement.style.setProperty('--header-text-color', tColor);
+            document.documentElement.style.setProperty('--header-text-color', document.getElementById('color-text').value);
             document.documentElement.style.setProperty('--logo-size', document.getElementById('range-logo').value + 'px');
             document.documentElement.style.setProperty('--header-font-size', document.getElementById('range-font').value + 'rem');
             
-            // Apply Gradient
-            const fullGrad = `linear-gradient(${gDir}, ${g1} 0%, ${g2} 50%, ${g3} 100%)`;
-            document.documentElement.style.setProperty('--bg-gradient', fullGrad);
-            
-            // Apply Database Button Gradient based on Primary
-            document.getElementById('btn-rekap').style.background = `linear-gradient(45deg, ${primary}, #155e33)`;
+            if (useGrad) {
+                gradSection.style.display = 'block';
+                const g1 = document.getElementById('grad-1').value;
+                const g2 = document.getElementById('grad-2').value;
+                const g3 = document.getElementById('grad-3').value;
+                const gDir = document.getElementById('grad-dir').value;
+                document.documentElement.style.setProperty('--bg-gradient', `linear-gradient(${gDir}, ${g1} 0%, ${g2} 50%, ${g3} 100%)`);
+                document.getElementById('btn-rekap').style.background = `linear-gradient(45deg, ${primary}, ${g2})`;
+            } else {
+                gradSection.style.display = 'none';
+                document.documentElement.style.setProperty('--bg-body', bgSolid);
+                document.documentElement.style.setProperty('--bg-gradient', 'none');
+                document.getElementById('btn-rekap').style.background = primary;
+            }
 
             document.body.setAttribute('data-theme', document.getElementById('theme-toggle').checked ? 'light' : 'dark');
         }
@@ -370,10 +346,12 @@
                 logoSize: document.getElementById('range-logo').value,
                 fontSize: document.getElementById('range-font').value,
                 textColor: document.getElementById('color-text').value,
-                grad1: document.getElementById('grad-1').value,
-                grad2: document.getElementById('grad-2').value,
-                grad3: document.getElementById('grad-3').value,
-                gradDir: document.getElementById('grad-dir').value
+                bgColor: document.getElementById('color-bg').value,
+                useGrad: document.getElementById('gradient-toggle').checked,
+                g1: document.getElementById('grad-1').value,
+                g2: document.getElementById('grad-2').value,
+                g3: document.getElementById('grad-3').value,
+                gDir: document.getElementById('grad-dir').value
             };
             localStorage.setItem('absensiConfig', JSON.stringify(config));
             new Audio(rawURL + config.sound).play().catch(() => {});
