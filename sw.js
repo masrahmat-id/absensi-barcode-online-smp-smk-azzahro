@@ -1,6 +1,5 @@
 const CACHE_NAME = 'offline-v1.0.4';
 const OFFLINE_URL = './offline.html';
-// Penambahan aset agar PWA cepat terdeteksi installable
 const ASSETS_TO_CACHE = [
   OFFLINE_URL,
   './index.html',
@@ -11,16 +10,13 @@ const ASSETS_TO_CACHE = [
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
-  console.log('Service Worker: Installed Version 1.0.1');
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Service Worker: Caching critical assets');
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
 });
 
-// Penambahan tahap Activate untuk pembersihan cache
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -35,7 +31,6 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Tetap menggunakan logika Fetch asli Anda
 self.addEventListener('fetch', (e) => {
   if (e.request.mode === 'navigate') {
     e.respondWith(
