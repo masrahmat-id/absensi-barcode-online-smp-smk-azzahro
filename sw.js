@@ -1,46 +1,47 @@
-const CACHE_NAME = 'offline-v1.0.4';
+const CACHE_NAME = 'absensi-azzahro-v1.0.4';
 const OFFLINE_URL = './offline.html';
+
+// Tambahkan library scanner dan file audio ke cache agar bisa bekerja offline
 const ASSETS_TO_CACHE = [
-  OFFLINE_URL,
+  './',
   './index.html',
-  'logo-smp-azzahro.png',
-  'logo-smk-azzahro.png',
+  OFFLINE_URL,
+  './logo-smp-azzahro.png',
+  './logo-smk-azzahro.png',
+  'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
   'https://github.com/masrahmat-id/absensi/raw/main/icon-absensi-azzahro%20(1).png'
 ];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
 });
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then((keys) => {
       return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
-          }
+        keys.map((key) => {
+          if (key !== CACHE_NAME) return caches.delete(key);
         })
       );
     })
   );
 });
 
+// LOGIKA STRATEGI: Cache First, falling back to Network
 self.addEventListener('fetch', (e) => {
-  if (e.request.mode === 'navigate') {
-    e.respondWith(
-      fetch(e.request).catch(() => {
-        return caches.open(CACHE_NAME).then((cache) => {
-          return cache.match(OFFLINE_URL);
-        });
-      })
-    );
-  } else {
-    e.respondWith(fetch(e.request));
-  }
+  e.respondWith(
+    caches.match(e.request).then((response) => {
+      // Balas dengan cache jika ada, jika tidak ambil dari internet
+      return response || fetch(e.request).catch(() => {
+        // Jika internet mati dan yang diminta adalah halaman web
+        if (e.request.mode === 'navigate') {
+          return caches.match(OFFLINE_URL);
+        }
+      });
+    })
+  );
 });
