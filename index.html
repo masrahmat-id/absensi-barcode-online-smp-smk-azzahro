@@ -378,61 +378,40 @@ Inovasi ini memungkinkan tenaga pendidik untuk lebih fokus pada esensi utama sek
     }).catch(err => console.error(err));
     </script>
 
-    <script>
-  // 1. Registrasi Service Worker Anda (sw.js)
+   <script>
+  // REGISTRASI SERVICE WORKER & LOGIKA PWA
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('SW terdaftar dengan versi: 1.0.1'))
-        .catch(err => console.log('SW Gagal:', err));
+        .then(reg => console.log('SW terdaftar (v1.0.1)'))
+        .catch(err => console.error('SW Gagal:', err));
     });
   }
 
-  // 2. Logika Pemicu Instalasi Otomatis
+  // LOGIKA INSTALASI OTOMATIS
   let deferredPrompt;
-
   window.addEventListener('beforeinstallprompt', (e) => {
-    // Mencegah browser menampilkan prompt default (agar kita bisa kontrol waktunya)
     e.preventDefault();
     deferredPrompt = e;
 
-    // Munculkan prompt otomatis setelah 2 detik halaman dimuat
+    // Munculkan prompt instalasi setelah 2 detik
     setTimeout(() => {
       if (deferredPrompt) {
-        deferredPrompt.prompt(); // Tampilkan jendela instalasi
-        
+        deferredPrompt.prompt();
         deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User menginstal aplikasi');
-          } else {
-            console.log('User menolak instalasi');
-          }
+          console.log(choiceResult.outcome === 'accepted' ? 'User menginstal' : 'User menolak');
           deferredPrompt = null;
         });
       }
     }, 2000); 
   });
 
-  // Tambahan: Hilangkan petunjuk manual jika aplikasi sudah terinstal (PWA mode)
+  // HILANGKAN INFO JIKA SUDAH TERINSTAL
   window.addEventListener('appinstalled', (evt) => {
-    console.log('Aplikasi berhasil diinstal!');
-    document.getElementById('fullscreen-info').style.display = 'none';
+    console.log('Aplikasi Berhasil Diinstal!');
+    const info = document.getElementById('fullscreen-info');
+    if (info) info.style.display = 'none';
   });
-</script>
-
-    <script>
-  // 1. Memeriksa dukungan browser
-  if ('serviceWorker' in navigator) {
-    
-    // 2. Mendaftarkan file Service Worker (sw.js)
-    navigator.serviceWorker.register('./sw.js')
-      .then((reg) => {
-        console.log('Pendaftaran berhasil!', reg);
-      })
-      .catch((err) => {
-        console.log('Pendaftaran gagal!', err);
-      });
-  }
 </script>
 </body>
 </html>
