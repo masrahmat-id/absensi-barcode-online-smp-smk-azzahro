@@ -1,35 +1,51 @@
-// Versi 1.0.1 - Terintegrasi dengan Offline Fallback
 const CACHE_NAME = 'offline-v1.0.4';
-const OFFLINE_URL = './offline.html'; // Pastikan file ini ada di root folder Anda
+const OFFLINE_URL = './offline.html';
+// Penambahan aset agar PWA cepat terdeteksi installable
+const ASSETS_TO_CACHE = [
+  OFFLINE_URL,
+  './index.html',
+  'logo-smp-azzahro.png',
+  'logo-smk-azzahro.png',
+  'https://github.com/masrahmat-id/absensi/raw/main/icon-absensi-azzahro%20(1).png'
+];
 
-// 1. Tahap Install
 self.addEventListener('install', (e) => {
   self.skipWaiting();
   console.log('Service Worker: Installed Version 1.0.1');
-
-  // Menyimpan halaman offline ke cache saat instalasi
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Service Worker: Caching offline page');
-      return cache.add(new Request(OFFLINE_URL, {cache: 'reload'}));
+      console.log('Service Worker: Caching critical assets');
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
 });
 
-// 2. Tahap Fetch (Logika Inti untuk mengatasi ERR_FAILED)
+// Penambahan tahap Activate untuk pembersihan cache
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
+      );
+    })
+  );
+});
+
+// Tetap menggunakan logika Fetch asli Anda
 self.addEventListener('fetch', (e) => {
-  // Hanya menangani navigasi halaman (ketika user buka link/refresh)
   if (e.request.mode === 'navigate') {
     e.respondWith(
       fetch(e.request).catch(() => {
-        // Jika fetch gagal (internet mati), ambil offline.html dari cache
         return caches.open(CACHE_NAME).then((cache) => {
           return cache.match(OFFLINE_URL);
         });
       })
     );
   } else {
-    // Untuk file lain (gambar, css, js), biarkan tetap menggunakan jaringan
     e.respondWith(fetch(e.request));
   }
 });
