@@ -1,28 +1,28 @@
 {
   "id": "index.html",
-  "short_name": "Absensi Az-Zahro",
-  "name": "Absensi Digital Az-Zahro",
-  "description": "Aplikasi Absensi Digital SMP Islam & SMK Az-Zahro",
+  "short_name": "Presensi Az-Zahro",
+  "name": "Presensi Digital Az-Zahro",
+  "description": "Aplikasi Presensi Digital SMP Islam Az-Zahro & SMK Az-Zahro",
   "icons": [
     {
-      "src": "./icon-apk-absensi-azzahro.png",
+      "src": "./icon-apk-presensi-azzahro.png",
       "type": "image/png",
       "sizes": "180x180"
     },
     {
-      "src": "./icon-apk-absensi-azzahro.png",
+      "src": "./icon-apk-presensi-azzahro.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any"
     },
     {
-      "src": "./icon-apk-absensi-azzahro.png",
+      "src": "./icon-apk-presensi-azzahro.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
     },
     {
-      "src": "./icon-apk-absensi-azzahro.png",
+      "src": "./icon-apk-presensi-azzahro.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
