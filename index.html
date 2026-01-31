@@ -423,16 +423,20 @@ Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi se
         (decodedText) => {
             if (isProcessing) return;
 
-            // Validasi: Cek jika ada lebih dari satu barcode yang terdeteksi dalam satu string
-            // Biasanya scanner menangkap baris baru (\n) atau spasi jika ada banyak barcode
-            const lines = decodedText.trim().split(/\s+/);
-            if (lines.length > 1) {
+            // Logika deteksi: Jika barcode berisi karakter baris baru (\n), 
+            // itu tandanya scanner menangkap lebih dari satu baris/kode secara bersamaan.
+            if (decodedText.includes('\n') || decodedText.includes('\r')) {
                 const s = document.getElementById('status-kirim');
                 s.innerText = "✖ SCAN SATU BARCODE SAJA!";
-                s.style.backgroundColor = "#e67e22"; // Oranye sebagai peringatan
+                s.style.backgroundColor = "#e67e22"; // Warna oranye peringatan
                 s.style.display = "block";
-                setTimeout(() => { s.style.display = "none"; s.style.backgroundColor = "var(--primary)"; }, 2500);
-                return; // Berhenti di sini, data tidak dikirim
+                
+                // Reset status agar user bisa mencoba scan ulang 1 barcode saja
+                setTimeout(() => { 
+                    s.style.display = "none"; 
+                    s.style.backgroundColor = "var(--primary)"; 
+                }, 2500);
+                return; // Data TIDAK dikirim
             }
 
             const ketValue = document.getElementById('keterangan').value;
@@ -446,12 +450,17 @@ Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi se
             }
 
             isProcessing = true;
-            document.getElementById('last-name-display').value = decodedText;
+            // Gunakan trim() untuk membersihkan spasi di awal/akhir jika ada
+            const cleanData = decodedText.trim();
+            document.getElementById('last-name-display').value = cleanData;
+            
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
             new Audio(rawURL + config.sound).play().catch(() => {});
-            fetch(`${scriptURL}?nama=${encodeURIComponent(decodedText)}&keterangan=${encodeURIComponent(ketValue)}`, { method: 'GET', mode: 'no-cors' });
+            
+            fetch(`${scriptURL}?nama=${encodeURIComponent(cleanData)}&keterangan=${encodeURIComponent(ketValue)}`, { method: 'GET', mode: 'no-cors' });
+            
             const s = document.getElementById('status-kirim');
-            s.innerText = "✔ TERKIRIM: " + decodedText;
+            s.innerText = "✔ TERKIRIM: " + cleanData;
             s.style.display = "block";
             setTimeout(() => { s.style.display = "none"; isProcessing = false; }, 2000);
         }).catch(err => console.error(err));
