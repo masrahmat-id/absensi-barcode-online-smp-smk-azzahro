@@ -422,6 +422,19 @@ Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi se
         html5QrCode.start({ facingMode: "environment" }, { fps: 25, qrbox: { width: 280, height: 280 }, aspectRatio: 0.75 }, 
         (decodedText) => {
             if (isProcessing) return;
+
+            // Validasi: Cek jika ada lebih dari satu barcode yang terdeteksi dalam satu string
+            // Biasanya scanner menangkap baris baru (\n) atau spasi jika ada banyak barcode
+            const lines = decodedText.trim().split(/\s+/);
+            if (lines.length > 1) {
+                const s = document.getElementById('status-kirim');
+                s.innerText = "✖ SCAN SATU BARCODE SAJA!";
+                s.style.backgroundColor = "#e67e22"; // Oranye sebagai peringatan
+                s.style.display = "block";
+                setTimeout(() => { s.style.display = "none"; s.style.backgroundColor = "var(--primary)"; }, 2500);
+                return; // Berhenti di sini, data tidak dikirim
+            }
+
             const ketValue = document.getElementById('keterangan').value;
             if (!ketValue || ketValue === "") {
                 const s = document.getElementById('status-kirim');
@@ -431,6 +444,7 @@ Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi se
                 setTimeout(() => { s.style.display = "none"; s.style.backgroundColor = "var(--primary)"; }, 2000);
                 return;
             }
+
             isProcessing = true;
             document.getElementById('last-name-display').value = decodedText;
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
