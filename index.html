@@ -93,21 +93,39 @@
         #reader { width: 100%; height: 100%; }
         #reader video { object-fit: cover !important; min-height: 450px; }
 
-        /* Style untuk tombol pilihan di layar scanner */
-        .scan-region-highlight {
-            border: 3px solid var(--primary) !important;
-            border-radius: 10px !important;
+        /* Container untuk pilihan barcode */
+        #selection-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 100; display: none;
+            flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+            padding: 20px; box-sizing: border-box; overflow-y: auto;
         }
-        
-        .scan-region-highlight-text {
-            background: var(--primary) !important;
-            color: white !important;
-            font-weight: bold !important;
-            padding: 5px 10px !important;
-            border-radius: 5px !important;
-            font-size: 14px !important;
-            cursor: pointer !important;
-            pointer-events: auto !important; /* Agar bisa diklik */
+        .barcode-option {
+            background: var(--primary); color: white; padding: 12px 20px;
+            border-radius: 10px; font-weight: bold; width: 90%; cursor: pointer;
+            border: 2px solid white; animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .corner {
+            position: absolute; width: 30px; height: 30px;
+            border: 5px solid var(--primary); z-index: 20;
+        }
+        .top-left { top: 85px; left: calc(50% - 140px); border-right: none; border-bottom: none; border-top-left-radius: 10px; }
+        .top-right { top: 85px; right: calc(50% - 140px); border-left: none; border-bottom: none; border-top-right-radius: 10px; }
+        .bottom-left { bottom: 85px; left: calc(50% - 140px); border-right: none; border-top: none; border-bottom-left-radius: 10px; }
+        .bottom-right { bottom: 85px; right: calc(50% - 140px); border-left: none; border-top: none; border-bottom-right-radius: 10px; }
+
+        @keyframes scanAnim {
+            0% { top: 85px; opacity: 0.2; }
+            50% { top: 365px; opacity: 1; }
+            100% { top: 85px; opacity: 0.2; }
+        }
+        .scan-line {
+            width: 280px; height: 3px; background: var(--primary);
+            position: absolute; left: 50%; transform: translateX(-50%);
+            z-index: 15; animation: scanAnim 3s infinite ease-in-out;
+            box-shadow: 0 0 20px var(--primary);
         }
 
         .last-scan-container { margin-top: 15px; width: 100%; }
@@ -210,11 +228,17 @@
         </div>
 
         <div class="scanner-box">
+            <div class="corner top-left"></div><div class="corner top-right"></div>
+            <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
+            <div class="scan-line"></div>
             <div id="reader"></div>
+            <div id="selection-overlay">
+                <p style="font-size: 12px; margin-bottom: 10px; font-weight: bold;">PILIH BARCODE:</p>
+            </div>
         </div>
 
         <div class="last-scan-container">
-            <input type="text" id="last-name-display" placeholder="KETUK NAMA PADA LAYAR..." readonly style="font-size: 16px;">
+            <input type="text" id="last-name-display" placeholder="MENUNGGU SCAN..." readonly>
         </div>
         
         <p id="fullscreen-info" style="font-size: 11px; opacity: 0.5; margin-top: 15px;">Ketuk layar untuk Fullscreen</p>
@@ -224,7 +248,6 @@
                 <span style="font-weight: bold; font-size: 16px;">Pengaturan</span>
                 <button class="btn-close-modal" onclick="cancelSettings()">×</button>
             </div>
-            
             <div class="section-title">Umum & Suara</div>
             <div class="setting-item">
                 <span>Notifikasi</span>
@@ -238,22 +261,18 @@
                     <option value="notification/Yayyy.mp3">Yayyy...!!</option>
                 </select>
             </div>
-
             <div class="section-title">Tampilan Visual</div>
             <div class="setting-item"><span>Logo</span><input type="range" id="range-logo" min="40" max="110" oninput="previewLayout()"></div>
             <div class="setting-item"><span>Font</span><input type="range" id="range-font" min="0.5" max="1.5" step="0.05" oninput="previewLayout()"></div>
-            
             <div class="setting-item">
                 <span>Teks</span><input type="color" id="color-text" oninput="previewLayout()">
                 <span>Garis</span><input type="color" id="color-picker" oninput="previewLayout()">
                 <span>Latar</span><input type="color" id="color-bg" oninput="previewLayout()">
             </div>
-            
             <div class="setting-item" style="border: 1px solid var(--primary); padding: 5px; border-radius: 5px;">
                 <span style="font-weight: bold;">Gunakan Gradien</span>
                 <input type="checkbox" id="gradient-toggle" onchange="previewLayout()">
             </div>
-
             <div id="gradient-controls">
                 <div class="setting-item">
                     <span>Atas</span><input type="color" id="grad-1" oninput="previewLayout()">
@@ -269,21 +288,21 @@
                     </select>
                 </div>
             </div>
-
             <div class="setting-item"><span>Mode Terang</span><input type="checkbox" id="theme-toggle" onchange="previewLayout()"></div>
-
-            <a href="https://azzahrolocare.github.io/rekapitulasi-presensi-siswa/" target="_blank" class="btn-database-trigger" id="btn-rekap">
-                REKAPITULASI PRESENSI SISWA
-            </a>
+            <a href="https://azzahrolocare.github.io/rekapitulasi-presensi-siswa/" target="_blank" class="btn-database-trigger" id="btn-rekap">REKAPITULASI PRESENSI SISWA</a>
             <div class="btn-about-trigger" onclick="showAbout()">ⓘ Tentang Aplikasi</div>
             <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
         </div>
 
         <div id="about-pop-up">
             <h3 style="margin-top:0; font-size: 18px;">Tentang Aplikasi</h3>
-            <p style="font-size:12px; line-height:1.6; text-align: left; opacity: 0.9;">
-                Aplikasi Presensi Digital berbasis QR Code untuk efisiensi administrasi sekolah Az-Zahro.
-            </p>
+            <p style="font-size:12px; line-height:1.6; text-align: left; opacity: 0.9;">"Aplikasi Presensi Digital SMP Islam & SMK Az-Zahro hadir sebagai solusi inovatif dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah.<br><br>Dengan fokus mentransformasi presensi konvensional menjadi sistem otomatis berbasis QR Code, aplikasi ini memastikan pendataan kehadiran berjalan cepat dan akurat.<br><br>Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi secara otomatis tanpa perlu rekapitulasi manual di akhir hari."</p>
+            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; font-size:11px; text-align:left; border-left: 3px solid var(--primary);">
+                <div style="text-align: center; font-size:13px; font-weight: bold; color: var(--primary);">IT DIGITALIZATION</div>
+                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 15px; font-size: 10px; color: var(--text-main);">SMP ISLAM AZ-ZAHRO & SMK AZ-ZAHRO</div>
+                <p style="margin: 5px 0;"><strong>Created by ops:</strong> Rahmattullah</p>
+                <p style="margin: 5px 0;"><strong>Email:</strong> mas.rahmat.id@gmail.com</p>
+            </div>
             <button class="btn-save" style="margin-top:15px; padding:10px;" onclick="closeAbout()">TUTUP</button>
         </div>
     </div>
@@ -324,7 +343,6 @@
                 logoSize: '65', fontSize: '0.9', textColor: '#ffffff', bgColor: '#121212',
                 useGrad: false, g1: '#121212', g2: '#1e1e1e', g3: '#000000', gDir: '180deg'
             };
-            
             document.getElementById('sound-choice').value = config.sound;
             document.getElementById('color-picker').value = config.primary;
             document.getElementById('range-logo').value = config.logoSize;
@@ -337,7 +355,6 @@
             document.getElementById('grad-2').value = config.g2;
             document.getElementById('grad-3').value = config.g3;
             document.getElementById('grad-dir').value = config.gDir;
-
             previewLayout();
         }
 
@@ -367,7 +384,6 @@
                 document.documentElement.style.setProperty('--bg-gradient', 'none');
                 document.getElementById('btn-rekap').style.background = primary;
             }
-
             document.body.setAttribute('data-theme', document.getElementById('theme-toggle').checked ? 'light' : 'dark');
         }
 
@@ -398,23 +414,21 @@
             toggleSettings();
         }
 
-        // FUNGSI KIRIM DATA (Dipicu saat nama diklik di layar)
-        function kirimDataAbsensi(nama) {
-            if (isProcessing) return;
-            
+        // FUNGSI KIRIM DATA
+        function sendPresence(nama) {
             const ketValue = document.getElementById('keterangan').value;
             if (!ketValue || ketValue === "") {
                 const s = document.getElementById('status-kirim');
-                s.innerText = "✖ PILIH HADIR/IZIN/SAKIT DULU!";
+                s.innerText = "✖ GAGAL: PILIH KETERANGAN DULU!";
                 s.style.backgroundColor = "#e74c3c";
                 s.style.display = "block";
                 setTimeout(() => { s.style.display = "none"; s.style.backgroundColor = "var(--primary)"; }, 2000);
+                isProcessing = false;
+                document.getElementById('selection-overlay').style.display = 'none';
                 return;
             }
 
-            isProcessing = true;
             document.getElementById('last-name-display').value = nama;
-            
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
             new Audio(rawURL + config.sound).play().catch(() => {});
             
@@ -423,36 +437,53 @@
             const s = document.getElementById('status-kirim');
             s.innerText = "✔ TERKIRIM: " + nama;
             s.style.display = "block";
+            
+            document.getElementById('selection-overlay').style.display = 'none';
             setTimeout(() => { s.style.display = "none"; isProcessing = false; }, 2000);
         }
 
         applySettings();
-
-        // KONFIGURASI SCANNER MULTI-SCAN
         const html5QrCode = new Html5Qrcode("reader");
-        const configScanner = { 
-            fps: 20, 
-            qrbox: (viewfinderWidth, viewfinderHeight) => {
-                return { width: viewfinderWidth * 0.9, height: viewfinderHeight * 0.9 };
-            },
-            aspectRatio: 0.75 
-        };
+        
+        // Logika Scanner Utama
+        html5QrCode.start({ facingMode: "environment" }, { fps: 25, qrbox: { width: 280, height: 280 }, aspectRatio: 0.75 }, 
+        (decodedText) => {
+            if (isProcessing) return;
 
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            configScanner,
-            (decodedText, decodedResult) => {
-                // Kamera akan terus mendeteksi tanpa "stop" otomatis.
-                // Nama muncul di layar sebagai overlay (dikelola library)
-                // Kita tambahkan logika klik pada label yang muncul
-                const highlights = document.querySelectorAll('.scan-region-highlight-text');
-                highlights.forEach(el => {
-                    if (el.innerText === decodedText) {
-                        el.onclick = () => kirimDataAbsensi(decodedText);
-                    }
+            // Jika terdeteksi lebih dari satu barcode (dipisah baris baru/spasi banyak)
+            const barcodes = decodedText.trim().split(/\n+/);
+            
+            if (barcodes.length > 1) {
+                isProcessing = true; // Kunci scanner agar tidak scan terus menerus
+                const overlay = document.getElementById('selection-overlay');
+                overlay.innerHTML = '<p style="font-size: 12px; margin-bottom: 10px; font-weight: bold;">PILIH BARCODE:</p>';
+                
+                barcodes.forEach(nama => {
+                    const btn = document.createElement('div');
+                    btn.className = 'barcode-option';
+                    btn.innerText = nama.trim();
+                    btn.onclick = () => sendPresence(nama.trim());
+                    overlay.appendChild(btn);
                 });
+                
+                // Tambahkan tombol batal
+                const btnBatal = document.createElement('div');
+                btnBatal.className = 'barcode-option';
+                btnBatal.style.background = '#7f8c8d';
+                btnBatal.innerText = 'BATAL';
+                btnBatal.onclick = () => {
+                    overlay.style.display = 'none';
+                    isProcessing = false;
+                };
+                overlay.appendChild(btnBatal);
+                
+                overlay.style.display = 'flex';
+            } else {
+                // Jika cuma satu barcode, kirim otomatis
+                isProcessing = true;
+                sendPresence(decodedText.trim());
             }
-        ).catch(err => console.error(err));
+        }).catch(err => console.error(err));
     </script>
 </body>
 </html>
