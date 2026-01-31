@@ -61,7 +61,6 @@
 
         .header-container img { width: var(--logo-size); height: var(--logo-size); object-fit: contain; }
 
-        /* NAMA SEKOLAH - SEKARANG MENGIKUTI WARNA TEKS UTAMA */
         .header-container h3 {
             margin: 0; font-size: var(--header-font-size);
             line-height: 1.1; color: var(--text-main); font-weight: 800;
@@ -94,25 +93,21 @@
         #reader { width: 100%; height: 100%; }
         #reader video { object-fit: cover !important; min-height: 450px; }
 
-        .corner {
-            position: absolute; width: 30px; height: 30px;
-            border: 5px solid var(--primary); z-index: 20;
+        /* Style untuk tombol pilihan di layar scanner */
+        .scan-region-highlight {
+            border: 3px solid var(--primary) !important;
+            border-radius: 10px !important;
         }
-        .top-left { top: 85px; left: calc(50% - 140px); border-right: none; border-bottom: none; border-top-left-radius: 10px; }
-        .top-right { top: 85px; right: calc(50% - 140px); border-left: none; border-bottom: none; border-top-right-radius: 10px; }
-        .bottom-left { bottom: 85px; left: calc(50% - 140px); border-right: none; border-top: none; border-bottom-left-radius: 10px; }
-        .bottom-right { bottom: 85px; right: calc(50% - 140px); border-left: none; border-top: none; border-bottom-right-radius: 10px; }
-
-        @keyframes scanAnim {
-            0% { top: 85px; opacity: 0.2; }
-            50% { top: 365px; opacity: 1; }
-            100% { top: 85px; opacity: 0.2; }
-        }
-        .scan-line {
-            width: 280px; height: 3px; background: var(--primary);
-            position: absolute; left: 50%; transform: translateX(-50%);
-            z-index: 15; animation: scanAnim 3s infinite ease-in-out;
-            box-shadow: 0 0 20px var(--primary);
+        
+        .scan-region-highlight-text {
+            background: var(--primary) !important;
+            color: white !important;
+            font-weight: bold !important;
+            padding: 5px 10px !important;
+            border-radius: 5px !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+            pointer-events: auto !important; /* Agar bisa diklik */
         }
 
         .last-scan-container { margin-top: 15px; width: 100%; }
@@ -140,7 +135,6 @@
             margin-bottom: 10px; border-bottom: 1px solid var(--primary); padding-bottom: 8px;
         }
         
-        /* JUDUL MODAL - SEKARANG MENGIKUTI WARNA TEKS UTAMA */
         .modal-header span, #about-pop-up h3 { color: var(--text-main) !important; }
 
         .btn-close-modal { background: none; border: none; color: var(--text-main); font-size: 24px; font-weight: bold; cursor: pointer; }
@@ -191,7 +185,8 @@
         #keterangan option[disabled] { display: none; }
     </style>
 </head>
-<body data-theme="dark" onclick="toggleFullscreen()"> <div id="status-kirim"></div>
+<body data-theme="dark" onclick="toggleFullscreen()"> 
+    <div id="status-kirim"></div>
     <div id="about-overlay" class="overlay-about" onclick="closeAbout()"></div>
 
     <div class="main-app">
@@ -215,14 +210,11 @@
         </div>
 
         <div class="scanner-box">
-            <div class="corner top-left"></div><div class="corner top-right"></div>
-            <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
-            <div class="scan-line"></div>
             <div id="reader"></div>
         </div>
 
         <div class="last-scan-container">
-            <input type="text" id="last-name-display" placeholder="MENUNGGU SCAN..." readonly>
+            <input type="text" id="last-name-display" placeholder="KETUK NAMA PADA LAYAR..." readonly style="font-size: 16px;">
         </div>
         
         <p id="fullscreen-info" style="font-size: 11px; opacity: 0.5; margin-top: 15px;">Ketuk layar untuk Fullscreen</p>
@@ -283,25 +275,15 @@
             <a href="https://azzahrolocare.github.io/rekapitulasi-presensi-siswa/" target="_blank" class="btn-database-trigger" id="btn-rekap">
                 REKAPITULASI PRESENSI SISWA
             </a>
-
             <div class="btn-about-trigger" onclick="showAbout()">ⓘ Tentang Aplikasi</div>
-
             <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
         </div>
 
         <div id="about-pop-up">
             <h3 style="margin-top:0; font-size: 18px;">Tentang Aplikasi</h3>
             <p style="font-size:12px; line-height:1.6; text-align: left; opacity: 0.9;">
-"Aplikasi Presensi Digital SMP Islam & SMK Az-Zahro hadir sebagai solusi inovatif dalam mendukung digitalisasi pendidikan serta efisiensi administrasi sekolah.<br><br>
-Dengan fokus mentransformasi presensi konvensional menjadi sistem otomatis berbasis QR Code, aplikasi ini memastikan pendataan kehadiran berjalan cepat dan akurat.<br><br>
-Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi secara otomatis tanpa perlu rekapitulasi manual di akhir hari."
+                Aplikasi Presensi Digital berbasis QR Code untuk efisiensi administrasi sekolah Az-Zahro.
             </p>
-            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px; font-size:11px; text-align:left; border-left: 3px solid var(--primary);">
-                <div style="text-align: center; font-size:13px; font-weight: bold; color: var(--primary);">IT DIGITALIZATION</div>
-                <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 15px; font-size: 10px; color: var(--text-main);">SMP ISLAM AZ-ZAHRO & SMK AZ-ZAHRO</div>
-                <p style="margin: 5px 0;"><strong>Created by ops:</strong> Rahmattullah</p>
-                <p style="margin: 5px 0;"><strong>Email:</strong> mas.rahmat.id@gmail.com</p>
-            </div>
             <button class="btn-save" style="margin-top:15px; padding:10px;" onclick="closeAbout()">TUTUP</button>
         </div>
     </div>
@@ -366,7 +348,6 @@ Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi se
             const textColor = document.getElementById('color-text').value;
             const gradSection = document.getElementById('gradient-controls');
 
-            // Apply global text color
             document.documentElement.style.setProperty('--text-main', textColor);
             document.documentElement.style.setProperty('--primary', primary);
             document.documentElement.style.setProperty('--logo-size', document.getElementById('range-logo').value + 'px');
@@ -417,32 +398,14 @@ Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi se
             toggleSettings();
         }
 
-        applySettings();
-        const html5QrCode = new Html5Qrcode("reader");
-        html5QrCode.start({ facingMode: "environment" }, { fps: 25, qrbox: { width: 280, height: 280 }, aspectRatio: 0.75 }, 
-        (decodedText) => {
+        // FUNGSI KIRIM DATA (Dipicu saat nama diklik di layar)
+        function kirimDataAbsensi(nama) {
             if (isProcessing) return;
-
-            // Logika deteksi: Jika barcode berisi karakter baris baru (\n), 
-            // itu tandanya scanner menangkap lebih dari satu baris/kode secara bersamaan.
-            if (decodedText.includes('\n') || decodedText.includes('\r')) {
-                const s = document.getElementById('status-kirim');
-                s.innerText = "✖ SCAN SATU BARCODE SAJA!";
-                s.style.backgroundColor = "#e67e22"; // Warna oranye peringatan
-                s.style.display = "block";
-                
-                // Reset status agar user bisa mencoba scan ulang 1 barcode saja
-                setTimeout(() => { 
-                    s.style.display = "none"; 
-                    s.style.backgroundColor = "var(--primary)"; 
-                }, 2500);
-                return; // Data TIDAK dikirim
-            }
-
+            
             const ketValue = document.getElementById('keterangan').value;
             if (!ketValue || ketValue === "") {
                 const s = document.getElementById('status-kirim');
-                s.innerText = "✖ GAGAL: PILIH KETERANGAN DULU!";
+                s.innerText = "✖ PILIH HADIR/IZIN/SAKIT DULU!";
                 s.style.backgroundColor = "#e74c3c";
                 s.style.display = "block";
                 setTimeout(() => { s.style.display = "none"; s.style.backgroundColor = "var(--primary)"; }, 2000);
@@ -450,20 +413,46 @@ Melalui integrasi langsung dengan cloud storage, seluruh data tersinkronisasi se
             }
 
             isProcessing = true;
-            // Gunakan trim() untuk membersihkan spasi di awal/akhir jika ada
-            const cleanData = decodedText.trim();
-            document.getElementById('last-name-display').value = cleanData;
+            document.getElementById('last-name-display').value = nama;
             
             const config = JSON.parse(localStorage.getItem('absensiConfig')) || { sound: 'Notif01.mp3' };
             new Audio(rawURL + config.sound).play().catch(() => {});
             
-            fetch(`${scriptURL}?nama=${encodeURIComponent(cleanData)}&keterangan=${encodeURIComponent(ketValue)}`, { method: 'GET', mode: 'no-cors' });
+            fetch(`${scriptURL}?nama=${encodeURIComponent(nama)}&keterangan=${encodeURIComponent(ketValue)}`, { method: 'GET', mode: 'no-cors' });
             
             const s = document.getElementById('status-kirim');
-            s.innerText = "✔ TERKIRIM: " + cleanData;
+            s.innerText = "✔ TERKIRIM: " + nama;
             s.style.display = "block";
             setTimeout(() => { s.style.display = "none"; isProcessing = false; }, 2000);
-        }).catch(err => console.error(err));
+        }
+
+        applySettings();
+
+        // KONFIGURASI SCANNER MULTI-SCAN
+        const html5QrCode = new Html5Qrcode("reader");
+        const configScanner = { 
+            fps: 20, 
+            qrbox: (viewfinderWidth, viewfinderHeight) => {
+                return { width: viewfinderWidth * 0.9, height: viewfinderHeight * 0.9 };
+            },
+            aspectRatio: 0.75 
+        };
+
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            configScanner,
+            (decodedText, decodedResult) => {
+                // Kamera akan terus mendeteksi tanpa "stop" otomatis.
+                // Nama muncul di layar sebagai overlay (dikelola library)
+                // Kita tambahkan logika klik pada label yang muncul
+                const highlights = document.querySelectorAll('.scan-region-highlight-text');
+                highlights.forEach(el => {
+                    if (el.innerText === decodedText) {
+                        el.onclick = () => kirimDataAbsensi(decodedText);
+                    }
+                });
+            }
+        ).catch(err => console.error(err));
     </script>
 </body>
 </html>
